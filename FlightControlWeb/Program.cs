@@ -13,7 +13,6 @@ namespace FlightControlWeb
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("kakipipi");
             CreateHostBuilder(args).Build().Run();
         }
 
