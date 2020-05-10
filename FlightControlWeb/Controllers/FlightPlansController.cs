@@ -14,7 +14,7 @@ namespace FlightControlWeb.Controllers
     public class FlightPlansController : ControllerBase
     {
         private readonly FlightContext _context;
-        private readonly FlightPlanManager _flightPlanManager;
+        private FlightPlanManager _flightPlanManager;
 
 
         public FlightPlansController(FlightContext context , FlightPlanManager flightPlanManager)
@@ -28,14 +28,14 @@ namespace FlightControlWeb.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<FlightPlan>>> GetFlightItems()
         {
-            //return await _context.FlightItems.ToListAsync();
+            return await _flightPlanManager.GetFlightItems();
         }
 
         // GET: api/FlightPlans/5
         [HttpGet("{id}")]
         public async Task<ActionResult<FlightPlan>> GetFlightPlan(long id)
         {
-            var flightPlan = await _context.FlightItems.FindAsync(id);
+            var flightPlan = await _flightPlanManager.GetFlightPlan(id);
 
             if (flightPlan == null)
             {
@@ -51,16 +51,17 @@ namespace FlightControlWeb.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutFlightPlan(long id, FlightPlan flightPlan)
         {
+
             if (id != flightPlan.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(flightPlan).State = EntityState.Modified;
+            _flightPlanManager.PutEntryState(flightPlan);
 
             try
             {
-                await _context.SaveChangesAsync();
+                 _flightPlanManager.SaveChanges();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -83,8 +84,7 @@ namespace FlightControlWeb.Controllers
         [HttpPost]
         public async Task<ActionResult<FlightPlan>> PostFlightPlan(FlightPlan flightPlan)
         {
-            _context.FlightItems.Add(flightPlan);
-            await _context.SaveChangesAsync();
+            _flightPlanManager.PostFlightPlan(flightPlan);
 
             //return CreatedAtAction("GetFlightPlan", new { id = flightPlan.Id }, flightPlan);
             return CreatedAtAction(nameof(GetFlightPlan), new { id = flightPlan.Id }, flightPlan);
