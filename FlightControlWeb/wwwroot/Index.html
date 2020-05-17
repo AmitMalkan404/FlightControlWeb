@@ -56,20 +56,14 @@
                     <div id="drop-area">
                         <form class="my-form">
                             <input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)">
+                            <table id="myflightstable" class="table table-bordered">
+                                <tr>
+                                    <th>Flight ID</th>
+                                    <th>Airline</th>
+                                </tr>
+                            </table>
                         </form>
-                        bla <br>
-                        bla <br>
-                        bla <br>
-                        bla <br>
-                        bla <br>
-                        bla <br>
-                        bla <br>
-                        bla <br>
-                        bla <br>
-                        bla <br>
-                        bla <br>
-                        bla <br>
-                        <label class="button" for="fileElem">Select JSON files</label>
+                        <!--<label class="button" for="fileElem">Select JSON files</label>-->
                     </div>
                 </div>
                 <h4>External Flights</h4>
@@ -96,9 +90,12 @@
             </div>
         </div>
     </div>
-
+    
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+        integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+        crossorigin="anonymous"></script>
     <script src="Scripts/Map.js"></script>
     <script src="Scripts/DragnDrop.js"></script>
-
+    <script src="Scripts/TableUpdates.js"></script>
 </body>
 </html>
