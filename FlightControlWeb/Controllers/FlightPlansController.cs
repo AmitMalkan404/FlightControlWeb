@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using FlightControlWeb.Models;
 using System.Text.Json;
 using Newtonsoft.Json;
+using System.Net.Http;
 
 namespace FlightControlWeb.Controllers
 {
@@ -24,25 +25,33 @@ namespace FlightControlWeb.Controllers
             _context = context;
         }
 
-        // GET: api/FlightPlans
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<FlightPlan>>> GetFlightItems()
-        {
-            return await _context.FlightItems.ToListAsync();
-        }
+        //// GET: api/FlightPlans
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<FlightPlan>>> GetFlightItems()
+        //{
+        //    return await _context.FlightItems.ToListAsync();
+        //}
 
         // GET: api/FlightPlans/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<FlightPlan>> GetFlightPlan(long id)
+        public async Task<ActionResult<FlightPlan>> GetFlightPlan(string id)
         {
-            var flightPlan = await _context.FlightItems.FindAsync(id);
-
-            if (flightPlan == null)
+            string request = Request.QueryString.Value;
+            var flightPlan = await _context.FlightItems.Where(x => x.FlightId == id).FirstOrDefaultAsync();
+            // Check in our server DB.
+            if (flightPlan != null)
+            {
+                return flightPlan;
+            }
+            var flightPlan2 = await CheckFlightPlanInServers(id);
+            if (flightPlan2 != null)
+            {
+                return flightPlan2;
+            }
+            else
             {
                 return NotFound();
             }
-
-            return flightPlan;
         }
 
         // PUT: api/FlightPlans/5
@@ -154,6 +163,38 @@ namespace FlightControlWeb.Controllers
                 i++;
             }
             return flightId;
+        }
+
+        public async Task<ActionResult<FlightPlan>> CheckFlightPlanInServers(string id)
+        {
+
+            FlightByServerId serverUrl = await _context.FlightByServerIds.Where(x => x.FlightId == id).FirstAsync();
+            //var flightByServerId = from flight in _context.FlightByServerIds where flight.FlightId == id select flight;
+
+            var flightPlan = await GetExternalFlightFromServer(serverUrl.ServerId, id);
+            if( flightPlan != null)
+            {
+                return flightPlan;
+            }
+
+            return null;
+        }
+        public async Task<ActionResult<FlightPlan>> GetExternalFlightFromServer(string myServerUrl,string id)
+        {
+            string url = "https://";
+            url += myServerUrl;
+            url += "/api/FlightPlans/" + id;
+            HttpClient client = new HttpClient();
+            var response = await client.GetStringAsync(url);
+            if (response == null) { 
+               return null;
+            }
+            string stringJsonFlight = response.ToString();
+            dynamic json = JsonConvert.DeserializeObject<FlightPlan>(stringJsonFlight);
+            FlightPlan flightPlan = new FlightPlan();
+            flightPlan = json;
+            flightPlan.IsExternal = true;
+            return flightPlan;
         }
     }
 }

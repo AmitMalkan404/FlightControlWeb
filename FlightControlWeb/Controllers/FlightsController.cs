@@ -61,6 +61,7 @@ namespace FlightControlWeb.Controllers
             return resultAllFlights;
         }
 
+
         // GET: api/Flights/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Flight>> GetFlight(string id)
@@ -170,6 +171,7 @@ namespace FlightControlWeb.Controllers
             for (int i = 0; i < allServers.Count; i++)
             {
                 List<Flight> tempFlights = await GetExternalFlightsFromServer(allServers[i], dateTime);
+                AddAllExternalFlightToDb(tempFlights, allServers[i].ServerURL);
                 allExternalFlights.AddRange(tempFlights);
             }
             return allExternalFlights;
@@ -265,6 +267,19 @@ namespace FlightControlWeb.Controllers
                 Longitude = longitudeResult,
             };
             return myLocation;
+        }
+        public async void AddAllExternalFlightToDb(List<Flight> allExternalFlight, string severUrl)
+        {
+            foreach (Flight flight in allExternalFlight)
+            {
+                FlightByServerId flightToDb = new FlightByServerId
+                {
+                    ServerId = severUrl,
+                    FlightId = flight.FlightId,
+                };
+                _context.FlightByServerIds.Add(flightToDb);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

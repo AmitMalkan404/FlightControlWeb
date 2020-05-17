@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 
 namespace FlightControlWeb.Models
 {
-	public class Server
+	public class FlightByServerId
 	{
 		public long id { get; set; }
 		public string ServerId { get; set; }
-		public string ServerURL { get; set; }
-
+		public string FlightId { get; set; }
 	}
 }
