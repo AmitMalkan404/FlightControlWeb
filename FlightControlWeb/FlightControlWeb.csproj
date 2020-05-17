@@ -5,6 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\js\**" />
+    <Compile Remove="wwwroot\styles\**" />
+    <Content Remove="wwwroot\js\**" />
+    <Content Remove="wwwroot\styles\**" />
+    <EmbeddedResource Remove="wwwroot\js\**" />
+    <EmbeddedResource Remove="wwwroot\styles\**" />
+    <None Remove="wwwroot\js\**" />
+    <None Remove="wwwroot\styles\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.3" />
@@ -16,8 +27,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwrot\js\" />
-    <Folder Include="wwwrot\styles\" />
+    <None Include="wwwroot\Scripts\DragnDrop.js" />
+    <None Include="wwwroot\Scripts\Map.js" />
+    <None Include="wwwroot\Index.html" />
+    <None Include="wwwroot\StyleSheet.css" />
+    <None Include="wwwroot\wallpaper2.jpg" />
   </ItemGroup>
 
 
