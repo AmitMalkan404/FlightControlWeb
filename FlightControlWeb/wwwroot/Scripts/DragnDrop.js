@@ -29,7 +29,6 @@ dropArea.addEventListener('drop', handleDrop, false)
 function handleDrop(e) {
     let dt = e.dataTransfer
     let files = dt.files
-
     handleFiles(files)
 }
 
@@ -39,13 +38,14 @@ function handleFiles(files) {
 
 function uploadFile(file) {
     let url = 'https://localhost:5001/api/FlightPlans'
-    let formData = new FormData()
+    //let formData = new FormData()
 
-    formData.append('file', file)
+    //formData.append('file', file)
+
 
     fetch(url, {
             method: 'POST',
-            body: formData
+            body: file
         })
         //Here i should use the server or services!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         .then(() => { /* Done. Inform the user */ console.log("yay") })
