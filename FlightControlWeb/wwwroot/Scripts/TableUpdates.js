@@ -30,16 +30,41 @@ let allMyFlightsUrl = "https://localhost:5001/api/Flights?relative_to=2020-12-27
 
 function getAllFlights() {
     $.getJSON(allMyFlightsUrl, function (data) {
+        $("#myflightstable").html('');
+        $("#myflightstable").append("<tr><td>" +
+            "Flight_Id".bold() +
+            "</td>" +
+            "<td>" +
+            "Airline".bold() +
+            "</td></tr>");
+        $("#externalFlightstable").html('');
+        $("#externalFlightstable").append("<tr><td>" +
+            "Flight_Id".bold() +
+            "</td>" +
+            "<td>" +
+            "Airline".bold() +
+            "</td></tr>");
         data.forEach(function (flight) {
-            $("#myflightstable").append("<tr><td>" +
-                flight.flight_id +
-                "</td>" +
-                "<td>" +
-                flight.company_name +
-                "</td></tr>");
+            let isExternal = flight.isExternal;
+            if (!isExternal) {
+                $("#myflightstable").append("<tr><td>" +
+                    flight.flight_id +
+                    "</td>" +
+                    "<td>" +
+                    flight.company_name +
+                    "</td></tr>");
+            } else {
+                $("#externalFlightstable").append("<tr><td>" +
+                    flight.flight_id +
+                    "</td>" +
+                    "<td>" +
+                    flight.company_name +
+                    "</td></tr>");
+            }
+
             //console.log(flight.FlightId);
             //console.log(flight.CompanyName);
-            console.log(typeof JSON.stringify(flight.FlightId));
+            //console.log(typeof JSON.stringify(flight.FlightId));
 
         });
     });

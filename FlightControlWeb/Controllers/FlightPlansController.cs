@@ -9,6 +9,7 @@ using FlightControlWeb.Models;
 using System.Text.Json;
 using Newtonsoft.Json;
 using System.Net.Http;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace FlightControlWeb.Controllers
 {
@@ -34,14 +35,16 @@ namespace FlightControlWeb.Controllers
 
         // GET: api/FlightPlans/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<FlightPlan>> GetFlightPlan(string id)
+        public async Task<ActionResult<FlightPlanFullData>> GetFlightPlan(string id)
         {
             string request = Request.QueryString.Value;
             var flightPlan = await _context.FlightItems.Where(x => x.FlightId == id).FirstOrDefaultAsync();
             // Check in our server DB.
             if (flightPlan != null)
             {
-                return flightPlan;
+                FlightPlanFullData flightPlanFullData = CreateFlightPlanFullData(flightPlan.CompanyName, flightPlan.DateTime,
+                    flightPlan.Latitude, flightPlan.Longitude, flightPlan.Passengers, flightPlan.FlightId);
+                return flightPlanFullData;
             }
             var flightPlan2 = await CheckFlightPlanInServers(id);
             if (flightPlan2 != null)
@@ -165,7 +168,7 @@ namespace FlightControlWeb.Controllers
             return flightId;
         }
 
-        public async Task<ActionResult<FlightPlan>> CheckFlightPlanInServers(string id)
+        public async Task<ActionResult<FlightPlanFullData>> CheckFlightPlanInServers(string id)
         {
 
             FlightByServerId serverUrl = await _context.FlightByServerIds.Where(x => x.FlightId == id).FirstAsync();
@@ -179,7 +182,7 @@ namespace FlightControlWeb.Controllers
 
             return null;
         }
-        public async Task<ActionResult<FlightPlan>> GetExternalFlightFromServer(string myServerUrl,string id)
+        public async Task<ActionResult<FlightPlanFullData>> GetExternalFlightFromServer(string myServerUrl,string id)
         {
             string url = "https://";
             url += myServerUrl;
@@ -191,10 +194,32 @@ namespace FlightControlWeb.Controllers
             }
             string stringJsonFlight = response.ToString();
             dynamic json = JsonConvert.DeserializeObject<FlightPlan>(stringJsonFlight);
-            FlightPlan flightPlan = new FlightPlan();
-            flightPlan = json;
-            flightPlan.IsExternal = true;
-            return flightPlan;
+            FlightPlanFullData flightPlanFullData = new FlightPlanFullData();
+            flightPlanFullData = json;
+            flightPlanFullData.IsExternal = true;
+            return flightPlanFullData;
+        }
+        // if something gets stuck - change back to async task...
+        public FlightPlanFullData CreateFlightPlanFullData(string companyName, DateTime dateTime,
+                    double latitude, double longitude, int passengers, string flightId)
+        {
+            InitialLocation initialLocation = new InitialLocation()
+            {
+                Longitude = longitude,
+                Latitude = latitude,
+                DateTime = dateTime,
+            };
+            var varSegments = from segment in _context.Segment where segment.FlightId == flightId select segment;
+            List<Segment> segments = varSegments.ToList();
+
+            FlightPlanFullData flightPlanFullData = new FlightPlanFullData()
+            {
+                Passengers = passengers,
+                CompanyName = companyName,
+                InitialLocation = initialLocation,
+                Segments = segments,
+            };
+            return flightPlanFullData;
         }
     }
 }

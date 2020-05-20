@@ -6,20 +6,19 @@ using System.Threading.Tasks;
 
 namespace FlightControlWeb.Models
 {
-	public class Flight
+	public class FlightPlanFullData
 	{
-		public long Id { get; set; }
 		[JsonPropertyName("flight_id")]
 		public string FlightId { get; set; }
-		[JsonPropertyName("longitude")]
-		public double Longitude { get; set; }
-		[JsonPropertyName("latitude")]
-		public double Latitude { get; set; }
+		[JsonPropertyName("passengers")]
 		public int Passengers { get; set; }
-		[JsonPropertyName("company_name")]
+		[JsonPropertyName("comapny_name")]
 		public string CompanyName { get; set; }
-		[JsonPropertyName("date_time")]
-		public DateTime DateTime { get; set; }
+		[JsonPropertyName("initial_location")]
+		public InitialLocation InitialLocation { get; set; }
+
+		[JsonPropertyName("segments")]
+		public List<Segment> Segments { get; set; }
 		[JsonPropertyName("is_external")]
 		public bool IsExternal { get; set; }
 	}
