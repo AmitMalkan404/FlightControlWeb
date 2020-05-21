@@ -70,4 +70,4 @@ function getAllFlights() {
     });
 }
 
-setInterval(getAllFlights, 3000);
+setInterval(getAllFlights, 500);
