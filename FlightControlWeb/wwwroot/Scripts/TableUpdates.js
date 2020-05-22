@@ -1,32 +1,10 @@
 ﻿//let allMyFlightsUrl = "https://localhost:5001/api/Flights?relative_to=2020-12-27T02:00:30Z&sync_all";
-//$.getJSON(allMyFlightsUrl, function (data) {
-//    data.forEach(function (flight) {
-//            ("#myflightstable").append("<tr><td>" +
-//                flight.FlightId +
-//                "</td>" +
-//                "<td>" +
-//                flight.CompanyName +
-//                "</td></tr>" >
-//            );
-//        });
-//    });
+let d = new Date();
+let utcString = d.toUTCString();
+let time = new Date(utcString);
+time = time.toISOString().slice(0, -2);
 
-//let allMyFlightsUrl = "https://localhost:5001/api/Flights?relative_to=2020-12-27T02:00:30Z&sync_all";
-//$.getJSON(allMyFlightsUrl, function(data) {
-//    data.forEach(function(flight) {
-//        $("#myflightstable").append("<tr><td>") +
-//            flight.FlightId +
-//            "</td>" +
-//            "<td>" +
-//            flight.CompanyName +
-//            "</td></tr>";
-//    });
-//});
-
-//const flightsBody = document.querySelector("#myflightstable")
-
-
-let allMyFlightsUrl = "https://localhost:5001/api/Flights?relative_to=2020-12-27T02:00:30Z&sync_all";
+let allMyFlightsUrl = "https://localhost:5001/api/Flights?relative_to=" + time + "Z&sync_all";
 
 function getAllFlights() {
     $.getJSON(allMyFlightsUrl, function (data) {
@@ -61,11 +39,6 @@ function getAllFlights() {
                     flight.company_name +
                     "</td></tr>");
             }
-
-            //console.log(flight.FlightId);
-            //console.log(flight.CompanyName);
-            //console.log(typeof JSON.stringify(flight.FlightId));
-
         });
     });
 }
