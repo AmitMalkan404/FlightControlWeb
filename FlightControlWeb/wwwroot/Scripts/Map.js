@@ -40,12 +40,13 @@ let airplaneIcon = L.icon({
 // End of Amit's code
 
 function addAirplaneIconToMap(latitude, longitude) {
-    //L.marker([latitude, longitude], { icon: airplaneIcon }).addTo(mymap);
-
     marker = new L.Marker([latitude, longitude], { icon: airplaneIcon });
-    //map.addLayer(marker);
     marker.addTo(mymap);
     return marker;
+}
+
+function removeMarkerFromMap(marker) {
+    mymap.removeLayer(marker);
 }
 
 function generatePlaneTrackArray(segment) {

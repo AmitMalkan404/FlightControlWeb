@@ -4,8 +4,8 @@
         this.latitude = lat;
         this.longitude = lon;
         this.iconExists = false;
-        this.exists = false;
     }
+
     setPlaneMarker(marker) {
         this.planeMarker = marker;
     }
@@ -40,23 +40,32 @@ function isInJsonArray(flight) {
     return false;
 }
 
-
+let flightsArray = new Array();
 let myFlightPlanUrl; 
+let latlngs = new Array();
 
-function getlatlngs(id, arrayIndex) {
-    myFlightPlanUrl = "api/FlightPlans/" + id;
-    let latlngs = new Array();
+function getlatlngs(flightsArray, arrayIndex) {
+    myFlightPlanUrl = "api/FlightPlans/" + flightsArray[arrayIndex].id;
+    
     $.getJSON(myFlightPlanUrl, function (data) {
         for (i = 0; i < data.segments.length; i++) {
             latlngs[i] = new Array(data.segments[i].latitude, data.segments[i].longitude);
         }
-        flightsArray[arrayIndex].setPlaneTrack = latlngs;
+        flightsArray[arrayIndex].setPlaneTrack = mapLine(latlngs);
+
+        console.log(flightsArray[arrayIndex].getPlaneTrack());
+
+        
+        //flightsArray[arrayIndex].setPlaneTrack = latlngs;
     });
-    mapLine(latlngs);
+
+    console.log(flightsArray[arrayIndex].getPlaneTrack());
+    //mapLine(latlngs);
+
 }
 
 
-let flightsArray = new Array();
+
 
 function getFlights() {
     let i = 0;
@@ -66,15 +75,15 @@ function getFlights() {
         data.forEach(function (flight) {
             if (!isInJsonArray(flight)) {
                 flightsArray[i] = new Flight(flight.flight_id, flight.latitude, flight.longitude);
-                if (flightsArray[i].iconExists) {
-                    map.removeLayer(flightsArray[i].planeIcon);
-                }
-                flightsArray[i].setPlaneMarker = addAirplaneIconToMap(flight.latitude, flight.longitude);
-                flightsArray[i].iconExists = true;
-                getlatlngs(flightsArray[i].id, i);
-                //flightsArray[i].setPlaneTrack = mapLine(getlatlngs(flightsArray[i].id));
-                i++;
             }
+            if (flightsArray[i].iconExists) {
+                removeMarkerFromMap(flightsArray[i].planeIcon);
+            }
+            flightsArray[i].setPlaneMarker = addAirplaneIconToMap(flight.latitude, flight.longitude);
+            flightsArray[i].iconExists = true;
+            getlatlngs(flightsArray,i);
+            //flightsArray[i].setPlaneTrack = mapLine(getlatlngs(flightsArray[i].id));
+            i++;
         });
     });
 }
