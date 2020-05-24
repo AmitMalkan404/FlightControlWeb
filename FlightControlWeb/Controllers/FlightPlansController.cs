@@ -42,8 +42,10 @@ namespace FlightControlWeb.Controllers
             // Check in our server DB.
             if (flightPlan != null)
             {
+                List<Segment> segmentList = new List<Segment>();
+                bool isExternal = false;
                 FlightPlanFullData flightPlanFullData = CreateFlightPlanFullData(flightPlan.CompanyName, flightPlan.DateTime,
-                    flightPlan.Latitude, flightPlan.Longitude, flightPlan.Passengers, flightPlan.FlightId);
+                    flightPlan.Latitude, flightPlan.Longitude, flightPlan.Passengers, flightPlan.FlightId,isExternal,segmentList);
                 return flightPlanFullData;
             }
             var flightPlan2 = await CheckFlightPlanInServers(id);
@@ -195,13 +197,30 @@ namespace FlightControlWeb.Controllers
             string stringJsonFlight = response.ToString();
             dynamic json = JsonConvert.DeserializeObject<FlightPlan>(stringJsonFlight);
             FlightPlanFullData flightPlanFullData = new FlightPlanFullData();
-            flightPlanFullData = json;
-            flightPlanFullData.IsExternal = true;
+            int passengers = json["passengers"];
+            string companyName = json["company_name"];
+            string flightId = json["flight_id"];
+            double longitude = json["initial_location"]["longitude"];
+            double latitude = json["initial_location"]["latitude"];
+            DateTime dateTime = json["initial_location"]["date_time"];
+            bool isExternal = true;
+            dynamic segments = json["segments"];
+            List<Segment> segmentList = new List<Segment>();
+            foreach (var seg in segments)
+            {
+                Segment newSeg = new Segment();
+                newSeg.Longitude = seg["longitude"];
+                newSeg.Latitude = seg["latitude"];
+                newSeg.TimespanSeconds = seg["timespan_seconds"];
+                newSeg.FlightId = flightId;
+                segmentList.Add(newSeg);
+            }
+            flightPlanFullData = CreateFlightPlanFullData(companyName, dateTime, latitude, longitude, passengers, flightId, isExternal, segmentList);
             return flightPlanFullData;
         }
         // if something gets stuck - change back to async task...
         public FlightPlanFullData CreateFlightPlanFullData(string companyName, DateTime dateTime,
-                    double latitude, double longitude, int passengers, string flightId)
+                    double latitude, double longitude, int passengers, string flightId, bool isExternal, List<Segment> segmentList)
         {
             InitialLocation initialLocation = new InitialLocation()
             {
@@ -209,9 +228,17 @@ namespace FlightControlWeb.Controllers
                 Latitude = latitude,
                 DateTime = dateTime,
             };
-            var varSegments = from segment in _context.Segment where segment.FlightId == flightId select segment;
-            List<Segment> segments = varSegments.ToList();
-
+            List<Segment> segments = new List<Segment>();
+            if (!isExternal)
+            {
+                var varSegments = from segment in _context.Segment where segment.FlightId == flightId select segment;
+                segments = varSegments.ToList();
+            }
+            else
+            {
+                segments = segmentList;
+            }
+            
             FlightPlanFullData flightPlanFullData = new FlightPlanFullData()
             {
                 Passengers = passengers,
@@ -219,6 +246,7 @@ namespace FlightControlWeb.Controllers
                 InitialLocation = initialLocation,
                 Segments = segments,
             };
+
             return flightPlanFullData;
         }
     }
