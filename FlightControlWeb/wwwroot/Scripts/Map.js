@@ -48,6 +48,14 @@ function generatePlaneTrackArray(segment) {
 
 function mapLine(latlngs) {
     let polyline = new L.polyline(latlngs, { color: 'red' });
-    polyline.addTo(mymap);
+    mymap.addLayer(polyline);
+    //polyline.addTo(mymap);
     return polyline;
 }
+
+function removeMapLine(line) {
+    mymap.removeLayer(line);
+}
+
+let poly = new L.polyline([20,25], { color: 'red' });
+mymap.addLayer(poly);

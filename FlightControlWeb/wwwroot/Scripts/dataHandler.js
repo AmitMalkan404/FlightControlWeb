@@ -61,7 +61,6 @@ let flightsArray = new Array();
 let myFlightPlanUrl; 
 let latlngs = new Array();
 
-
 function getlatlngs(flightsArray, arrayIndex) {
     myFlightPlanUrl = "api/FlightPlans/" + flightsArray[arrayIndex].id;
     
@@ -71,13 +70,13 @@ function getlatlngs(flightsArray, arrayIndex) {
         }
         flightsArray[arrayIndex].setPlaneTrack(mapLine(latlngs));
 
-        console.log(flightsArray[arrayIndex].getPlaneTrack());
+        //console.log(flightsArray[arrayIndex].getPlaneTrack());
 
         
         //flightsArray[arrayIndex].setPlaneTrack = latlngs;
     });
 
-    console.log(flightsArray[arrayIndex].getPlaneTrack());
+    //console.log(flightsArray[arrayIndex].getPlaneTrack());
     //mapLine(latlngs);
 
 }
@@ -88,7 +87,7 @@ let i = 0;
 function getFlights() {
 
     $.getJSON(allMyFlightsUrl, function (data) {
-        console.log(data);
+        //console.log(data);
         data.forEach(function (jsonFlight) {
             if (!isInFlightsArray(jsonFlight)) {
                 flightsArray[i] = new Flight(jsonFlight.flight_id, jsonFlight.latitude, jsonFlight.longitude, jsonFlight.company_name);
@@ -128,6 +127,12 @@ function addRowToTable(tableId, flight, jsonFlight) {
         btnImage.setAttribute("src", "Pictures/remove.png");
         btnImage.setAttribute("width", 25);
         btnImage.setAttribute("height", 25);
+
+        btn.onclick = function() {
+            deleteFlight(this, flight);
+            return false;
+        }
+
         btn.appendChild(btnImage);
         let removeCell = flight.myFlightsRow.insertCell(2);
         removeCell.appendChild(btn);
@@ -142,12 +147,34 @@ function addRowToTable(tableId, flight, jsonFlight) {
     }
 }
 
-//deleteFlight(flight.myFlightsRow.rowIndex, tableId);
 
-function deleteFlight(rowIndex, tableId) {
+function deleteFlight(deleteButton, flightToDelete) {
 
-    //delete row from table table
-    document.getElementById(tableId).deleteFlight(rowIndex);
+    let deleteFlightUrl = "api/Flights/" + flightToDelete.id;
+
+
+    let rowIndex = deleteButton.parentNode.parentNode.rowIndex;
+
+    fetch(deleteFlightUrl,
+        {
+            method: 'DELETE',
+        })
+
+        .then(() => { /* Done. Inform the user */
+            //delete row from flights table
+            document.getElementById("myflightstable").deleteRow(rowIndex);
+            removeMarkerFromMap(flightToDelete.planeMarker);
+            removeMapLine(flightToDelete.track);
+
+            console.log("flight deleted successfully");
+        })
+        .catch(() => { /* Error. Inform the user */
+            console.log("Error Deleting flight");
+        });
+
+
+    
+
 }
 
 
