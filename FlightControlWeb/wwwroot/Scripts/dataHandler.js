@@ -89,4 +89,19 @@ function getFlights() {
 }
 
 
+
+function removeFlightByID(id) {
+    let z = 0;
+    for (z = 0; z < arr.length; z++) {
+        if (flightsArray[z].flight_id == id) {
+            arr.splice(z, 1);
+            z--;
+        }
+    }
+}
+
+function getFlightByID(id) {
+
+}
+
 setInterval(getFlights, 2000);
