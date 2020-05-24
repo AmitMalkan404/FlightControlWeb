@@ -142,11 +142,13 @@ function addRowToTable(tableId, flight, jsonFlight) {
     }
 }
 
-//deleteRow(flight.myFlightsRow.rowIndex, tableId);
+//deleteFlight(flight.myFlightsRow.rowIndex, tableId);
 
-function deleteRow(rowIndex, tableId) {
-    document.getElementById(tableId).deleteRow(rowIndex);
+function deleteFlight(rowIndex, tableId) {
+
+    //delete row from table table
+    document.getElementById(tableId).deleteFlight(rowIndex);
 }
 
 
-setInterval(getFlights, 4000);
+setInterval(getFlights, 3000);

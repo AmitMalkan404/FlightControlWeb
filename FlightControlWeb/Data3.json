@@ -1,21 +1,21 @@
 {
-	"passengers": 150,
+	"passengers": 100,
 	"company_name": "united",
 	"initial_location": {
-		"longitude": 20.0,
-		"latitude": 30.2,
-    "date_time": "2020-05-24T17:43:00Z"
+		"longitude": 50.0,
+		"latitude": 65.0,
+    "date_time": "2020-05-24T19:19:00Z"
 	},
 	"segments": [
 		{
-			"longitude": 33.23,
-			"latitude": 31.56,
-			"timespan_seconds": 850
+			"longitude": 51.0,
+			"latitude": 68.0,
+			"timespan_seconds": 1500
 		},
 		{
-			"longitude": 33.23,
-			"latitude": 31.56,
-			"timespan_seconds": 850
+			"longitude": 81.0,
+			"latitude": 78.0,
+			"timespan_seconds": 2000
 		}
 	]
 }
