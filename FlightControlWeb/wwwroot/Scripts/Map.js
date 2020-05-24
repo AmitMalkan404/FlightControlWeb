@@ -16,32 +16,25 @@ let airplaneIcon = L.icon({
     iconAnchor: [0, 0],
 });
 
+
+
 //L.marker([19.02, 57.52], { icon: airplaneIcon }).addTo(mymap);
 //L.marker([29.72, 35.00], { icon: airplaneIcon }).addTo(mymap);
 
-//let latlngs = [
-//    [[32.01, 34.88],
-//        [19.02, 57.52],
-//        [13.77, 100.66]],
-
-//    [[29.72, 35.00],
-//        [32.46, 34.23],
-//        [34.89, 34.34],
-//        [34.92, 33.59]]
-//];
-
-//let latlngs = [[32.01, 34.88], [19.02, 57.52], [13.77, 100.66]];
+//moveMarker(markerr, 15.51, 28.00);
 
 
-//let polyline = L.polyline(latlngs, { color: 'red' }).addTo(mymap);
-// zoom the map to the polyline
-//map.fitBounds(polyline.getBounds());
+function moveMarker(marker, lat, lon) {
 
-// End of Amit's code
+    let newLatLng = new L.LatLng(lat, lon);
+    //marker.setLatLng(newLatLng);
+    marker.setLatLng(newLatLng).update();
+}
+
 
 function addAirplaneIconToMap(latitude, longitude) {
     marker = new L.Marker([latitude, longitude], { icon: airplaneIcon });
-    marker.addTo(mymap);
+    mymap.addLayer(marker);
     return marker;
 }
 

@@ -1,21 +1,21 @@
 {
-	"passengers": 150,
+	"passengers": 320,
 	"company_name": "israelair",
 	"initial_location": {
-		"longitude": 20.0,
-		"latitude": 30.2,
-		"date_time": "2020-05-21T23:07:00Z"
+		"longitude": 15.23,
+		"latitude": 50.56,
+		"date_time": "2020-05-24T17:43:00Z"
 	},
 	"segments": [
 		{
-			"longitude": 33.23,
-			"latitude": 31.56,
-			"timespan_seconds": 850
+			"longitude": 15.23,
+			"latitude": 50.56,
+			"timespan_seconds": 1500
 		},
 		{
-			"longitude": 33.23,
-			"latitude": 31.56,
-			"timespan_seconds": 850
+			"longitude": 25.25,
+			"latitude": 70.55,
+			"timespan_seconds": 4000
 		}
 	]
 }
