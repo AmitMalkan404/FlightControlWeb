@@ -164,17 +164,13 @@ function deleteFlight(deleteButton, flightToDelete) {
             //delete row from flights table
             document.getElementById("myflightstable").deleteRow(rowIndex);
             removeMarkerFromMap(flightToDelete.planeMarker);
-            removeMapLine(flightToDelete.track);
+            removeMapLine(flightToDelete.getPlaneTrack());
 
             console.log("flight deleted successfully");
         })
         .catch(() => { /* Error. Inform the user */
             console.log("Error Deleting flight");
         });
-
-
-    
-
 }
 
 

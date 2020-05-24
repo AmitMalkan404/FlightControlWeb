@@ -54,8 +54,13 @@ function mapLine(latlngs) {
 }
 
 function removeMapLine(line) {
+    console.log(line);
     mymap.removeLayer(line);
 }
 
-let poly = new L.polyline([20,25], { color: 'red' });
-mymap.addLayer(poly);
+
+//let latlng = [[32.01, 34.88], [19.02, 57.52], [13.77, 100.66]];
+
+//let poly = new L.polyline(latlng, { color: 'red' });
+//mymap.addLayer(poly);
+//mymap.removeLayer(poly);
