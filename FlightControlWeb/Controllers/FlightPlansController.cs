@@ -134,7 +134,7 @@ namespace FlightControlWeb.Controllers
             _context.FlightItems.Add(flightPlan);
             await _context.SaveChangesAsync();
 
-            //return CreatedAtAction("GetFlightPlan", new { id = flightPlan.Id }, flightPlan);
+            //return CreatedAtAction("GetFlightPlan", new { id = flightPlan.Id }, flightPlan); 
             return CreatedAtAction(nameof(GetFlightPlan), new { id = flightPlan.Id }, flightPlan);
         }
 
