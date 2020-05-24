@@ -32,7 +32,7 @@ function getAllFlights() {
         data.forEach(function (flight) {
             let isExternal = flight.isExternal;
             if (!isExternal) {
-                $("#myflightstable").append("<tr id =" + flight.flight_id +"><td>" +
+                $("#myflightstable").append("<tr><td>" +
                     flight.flight_id +
                     "</td>" +
                     "<td>" +
@@ -42,7 +42,7 @@ function getAllFlights() {
                     "<button class='removeFlightBtn' name='removeFlightBtn' class='btn btn-default'><img src='Pictures/remove.png' width='25px' height='25px'></button>" + 
                     "</td></tr>");
             } else {
-                $("#externalFlightstable").append("<tr id =" + flight.flight_id +"><td>" +
+                $("#externalFlightstable").append("<tr><td>" +
                     flight.flight_id +
                     "</td>" +
                     "<td>" +
@@ -52,20 +52,16 @@ function getAllFlights() {
                     "<button class='removeFlightBtn' name='removeFlightBtn' class='btn btn-default'><img src='Pictures/remove.png' width='25px' height='25px'></button>" +
                     "</td></tr>");
             }
+            rowIndex++;
         });
     });
 }
-//connecting jquery
-$('input[type=button]').click(function () {
-    var trid = $(this).closest('tr').attr('id'); // table row ID 
-});
 
-//removing jquery
 $("#myflightstable").on("click", "removeFlightBtn", function (e) {
     $(this).closest("tr").remove();
+    //needs to send a command to the server to remove the flight from DB, it's refreshing & adding it again
 });
 $("#externalFlightstable").on("click", "removeFlightBtn", function (e) {
     $(this).closest("tr").remove();
 });
-
 setInterval(getAllFlights, 500);
