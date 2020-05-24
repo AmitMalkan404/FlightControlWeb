@@ -32,7 +32,7 @@
     <None Include="wwwroot\Scripts\Map.js" />
     <None Include="wwwroot\Index.html" />
     <None Include="wwwroot\StyleSheet.css" />
-    <None Include="wwwroot\wallpaper2.jpg" />
+    <None Include="wwwroot\Pictures\wallpaper2.jpg" />
   </ItemGroup>
 
 

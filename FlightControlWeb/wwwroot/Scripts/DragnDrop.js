@@ -43,11 +43,17 @@ function uploadFile(file) {
     //formData.append('file', file)
 
 
-    fetch(url, {
-            method: 'POST',
-            body: file
-        })
+    fetch(url,
+            {
+                method: 'POST',
+                body: file
+            })
         //Here i should use the server or services!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        .then(() => { /* Done. Inform the user */ console.log("yay") })
-        .catch(() => { /* Error. Inform the user */ console.log("oops") })
+        .then(() => { /* Done. Inform the user */
+            
+            //get latitude and longitude before.
+        })
+        .catch(() => { /* Error. Inform the user */
+            console.log("oops");
+        });
 }
