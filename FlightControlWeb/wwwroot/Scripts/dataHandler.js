@@ -174,4 +174,4 @@ function deleteFlight(deleteButton, flightToDelete) {
 }
 
 
-setInterval(getFlights, 3000);
+setInterval(getFlights, 20000);

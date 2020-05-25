@@ -9,6 +9,7 @@ using FlightControlWeb.Models;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace FlightControlWeb.Controllers
 {
@@ -180,9 +181,11 @@ namespace FlightControlWeb.Controllers
         public async Task<List<Flight>> GetExternalFlightsFromServer(Server myServer, string dateTime)
         {
             List<Flight> allExternalFlights = new List<Flight>();
-            string url = "https://";
+            //string url = "https://";
+            string url = "";
             url += myServer.ServerURL;
-            url += "/api/Flights?relative_to=";
+            //url += "/api/Flights?relative_to=";
+            url += "Flights?relative_to=";
             //dateTime = dateTime.AddHours(2);
             //dateTime.ToString("yyyy-MM-dd HH':'mm':'ss");
             string date = dateTime.ToString();
@@ -190,10 +193,22 @@ namespace FlightControlWeb.Controllers
             HttpClient client = new HttpClient();
             var response = await client.GetStringAsync(url);
             string stringJsonFlight = response.ToString();
-            dynamic json = JsonConvert.DeserializeObject<List<Flight>>(stringJsonFlight);
-            foreach(var flight in json)
+            dynamic dJson = JsonConvert.DeserializeObject(stringJsonFlight);
+            foreach(var flight in dJson)
             {
-                allExternalFlights.Add(flight);
+                JToken json = flight;
+                Segment segmentFlight = new Segment
+                {
+                    Latitude = flight["latitude"],
+                    Longitude = flight["longitude"],
+                };
+                int passengers = flight["passengers"];
+                string companyName = flight["company_name"];
+                string flightId = flight["flight_id"];
+                DateTime dateTimeFlight = flight["date_time"];
+                bool isExternalFlight = true;
+                Flight flightcreateFlight = CreateFlight(companyName, flightId, passengers, isExternalFlight, segmentFlight, dateTimeFlight);
+                allExternalFlights.Add(flightcreateFlight);
             }
             return allExternalFlights;
         }
