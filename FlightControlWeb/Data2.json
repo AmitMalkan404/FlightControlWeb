@@ -4,18 +4,18 @@
 	"initial_location": {
 		"longitude": 15.23,
 		"latitude": 50.56,
-    "date_time": "2020-05-24T20:37:00Z"
-	},
+    "date_time": "2020-05-25T16:26:00Z"
+  },
 	"segments": [
 		{
 			"longitude": 15.23,
 			"latitude": 50.56,
-			"timespan_seconds": 1500
+			"timespan_seconds": 25000
 		},
 		{
 			"longitude": 25.25,
 			"latitude": 70.55,
-			"timespan_seconds": 4000
+			"timespan_seconds": 17000
 		}
 	]
 }

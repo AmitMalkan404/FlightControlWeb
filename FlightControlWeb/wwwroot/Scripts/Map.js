@@ -10,18 +10,58 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 }).addTo(mymap);
 
 //Added by Amit
-let airplaneIcon = L.icon({
-    iconUrl: "Pictures/plane.png" ,
-    iconSize: [30, 30],
-    iconAnchor: [0, 0],
+let unselectedIcon = L.icon({
+    iconUrl: "Pictures/unselectedIcon.png" ,
+    iconSize: [55, 55],
+    iconAnchor: [0, 0]
 });
 
+let selectedIcon = L.icon({
+    iconUrl: "Pictures/selectedIcon.png",
+    iconSize: [70, 70],
+    iconAnchor: [0, 0]
+});
 
+let isMarkerClicked = false;
+let clickedMarker = null;
 
 //L.marker([19.02, 57.52], { icon: airplaneIcon }).addTo(mymap);
 //L.marker([29.72, 35.00], { icon: airplaneIcon }).addTo(mymap);
 
 //moveMarker(markerr, 15.51, 28.00);
+
+
+function releaseClick() {
+    if (isMarkerClicked) {
+        clickedMarker.setIcon(unselectedIcon);
+        paintTableRow(clickedMarker, "unMark");
+        isMarkerClicked = false;
+    }
+}
+
+function onMapClick(e) {
+    releaseClick();
+}
+
+function onMarkerClick(e) {
+    if (isMarkerClicked) {
+        releaseClick();
+    } 
+    e.target.setIcon(selectedIcon);
+    isMarkerClicked = true;
+    clickedMarker = e.target;
+    paintTableRow(e.target, "mark");
+}
+
+function markerClick(marker) {
+    if (isMarkerClicked) {
+        releaseClick();
+    }
+    marker.setIcon(selectedIcon);
+    isMarkerClicked = true;
+    clickedMarker = marker;
+    paintTableRow(marker, "mark");
+}
 
 
 function moveMarker(marker, lat, lon) {
@@ -33,7 +73,8 @@ function moveMarker(marker, lat, lon) {
 
 
 function addAirplaneIconToMap(latitude, longitude) {
-    marker = new L.Marker([latitude, longitude], { icon: airplaneIcon });
+    marker = new L.Marker([latitude, longitude], { icon: unselectedIcon });
+    marker.on('click', this.onMarkerClick, this);
     mymap.addLayer(marker);
     return marker;
 }
@@ -58,6 +99,8 @@ function removeMapLine(line) {
     mymap.removeLayer(line);
 }
 
+
+mymap.on('click', onMapClick);
 
 //let latlng = [[32.01, 34.88], [19.02, 57.52], [13.77, 100.66]];
 
