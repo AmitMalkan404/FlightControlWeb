@@ -27,31 +27,20 @@ let clickedMarker = null;
 
 //L.marker([19.02, 57.52], { icon: airplaneIcon }).addTo(mymap);
 //L.marker([29.72, 35.00], { icon: airplaneIcon }).addTo(mymap);
-
 //moveMarker(markerr, 15.51, 28.00);
 
 
 function releaseClick() {
     if (isMarkerClicked) {
         clickedMarker.setIcon(unselectedIcon);
-        paintTableRow(clickedMarker, "unMark");
+        linkRowAndDetails(clickedMarker, "unLink");
         isMarkerClicked = false;
     }
 }
 
-function onMapClick(e) {
+function onMapClick() {
     releaseClick();
 }
-
-//function onMarkerClick(e) {
-//    if (isMarkerClicked) {
-//        releaseClick();
-//    } 
-//    e.target.setIcon(selectedIcon);
-//    isMarkerClicked = true;
-//    clickedMarker = e.target;
-//    paintTableRow(e.target, "mark");
-//}
 
 function onMarkerClick(marker) {
     if (isMarkerClicked) {
@@ -60,9 +49,8 @@ function onMarkerClick(marker) {
     marker.setIcon(selectedIcon);
     isMarkerClicked = true;
     clickedMarker = marker;
-    paintTableRow(marker, "mark");
+    linkRowAndDetails(marker, "link");
 }
-
 
 function moveMarker(marker, lat, lon) {
 
@@ -70,7 +58,6 @@ function moveMarker(marker, lat, lon) {
     //marker.setLatLng(newLatLng);
     marker.setLatLng(newLatLng).update();
 }
-
 
 function addAirplaneIconToMap(latitude, longitude) {
     let marker = new L.Marker([latitude, longitude], { icon: unselectedIcon });
