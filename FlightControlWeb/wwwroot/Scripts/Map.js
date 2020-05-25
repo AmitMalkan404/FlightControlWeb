@@ -43,17 +43,17 @@ function onMapClick(e) {
     releaseClick();
 }
 
-function onMarkerClick(e) {
-    if (isMarkerClicked) {
-        releaseClick();
-    } 
-    e.target.setIcon(selectedIcon);
-    isMarkerClicked = true;
-    clickedMarker = e.target;
-    paintTableRow(e.target, "mark");
-}
+//function onMarkerClick(e) {
+//    if (isMarkerClicked) {
+//        releaseClick();
+//    } 
+//    e.target.setIcon(selectedIcon);
+//    isMarkerClicked = true;
+//    clickedMarker = e.target;
+//    paintTableRow(e.target, "mark");
+//}
 
-function markerClick(marker) {
+function onMarkerClick(marker) {
     if (isMarkerClicked) {
         releaseClick();
     }
@@ -73,8 +73,13 @@ function moveMarker(marker, lat, lon) {
 
 
 function addAirplaneIconToMap(latitude, longitude) {
-    marker = new L.Marker([latitude, longitude], { icon: unselectedIcon });
-    marker.on('click', this.onMarkerClick, this);
+    let marker = new L.Marker([latitude, longitude], { icon: unselectedIcon });
+    //marker.on('click', this.onMarkerClick, this);
+
+    marker.addEventListener("click", function () {
+        onMarkerClick(marker);
+    }, false);
+
     mymap.addLayer(marker);
     return marker;
 }

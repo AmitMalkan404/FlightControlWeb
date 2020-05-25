@@ -136,17 +136,13 @@ function getFlights() {
     });
 }
 
-function func(flight) {
-    //flight.planeMarker.fireEvent('click');
-}
-
 function addRowToTable(tableId, flight, jsonFlight) {
 
     flight.tableRow = document.createElement("TR");
 
     //flight.tableRow.addEventListener("click", markerClick, flight.planeMarker);
     flight.tableRow.addEventListener("click", function () {
-        markerClick(flight.planeMarker);
+        onMarkerClick(flight.planeMarker);
     }, false);
 
     document.getElementById(tableId).appendChild(flight.tableRow);
