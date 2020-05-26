@@ -141,6 +141,7 @@ function getFlights() {
                 flightsArray[i].setPlaneMarker(addAirplaneIconToMap(jsonFlight.latitude, jsonFlight.longitude));
                 flightsArray[i].iconExists = true;
             }
+            console.log(jsonFlight.latitude, jsonFlight.longitude);
             moveMarker(flightsArray[i].getPlaneMarker(), jsonFlight.latitude, jsonFlight.longitude);
             updateFlightDetails(flightsArray[i]);
             checkExternalFlightExists(data, flightsArray);
@@ -150,25 +151,37 @@ function getFlights() {
 }
 
 function checkExternalFlightExists(data, flightsArray) {
-    
+    let externalFlightsArray = new Array();
+    let j = 0, k = 0;
+    data.foreach(function (exflight) {
+        if (exflight.isexternal === true) {
+            externalflightsarray[j] = new flight(exflight.flight_id, exflight.latitude,
+                exflight.longitude, exflight.company_name, exflight.passengers);
+        }
+        j++;
+    });
+    for (j = 0; j < flightsArray.length; j++) {
+        let isExist = 0;
+        for (k = 0; k < externalFlightsArray.length; k++) {
+            if (flightsArray[j].id === externalFlightsArray[k].id) {
+                isExist = 1;
+            }
+        }
+        if (isExist === 0) {
+            document.getElementById("externalFlightstable").deleteRow(
+                flightsArray[j].tableRow.rowIndex);
+            removeMarkerFromMap(flightsArray[j].planeMarker);
 
+            //remove flight details
+            if (details[1] === flightsArray[j].id) {
+                removeFlightDetails();
+            }
 
-
-
-
-
-
-    //document.getElementById("myflightstable").deleteRow(rowIndex);
-    //removeMarkerFromMap(flightToDelete.planeMarker);
-
-    ////remove flight details
-    //if (details[1] === flightToDelete.id) {
-    //    removeFlightDetails();
-    //}
-
-    ////remove track if it belongs to this flight
-    //if (track[1] !== null && track[1] === flightToDelete.id) {
-    //    removeTrack();
+            //remove track if it belongs to this flight
+            if (track[1] !== null && track[1] === flightsArray[j].id) {
+                removeTrack();
+            }
+        }
     }
 }
 
