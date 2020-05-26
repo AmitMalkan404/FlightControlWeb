@@ -55,8 +55,8 @@ function onMarkerClick(marker) {
 function moveMarker(marker, lat, lon) {
 
     let newLatLng = new L.LatLng(lat, lon);
-    //marker.setLatLng(newLatLng);
-    marker.setLatLng(newLatLng).update();
+    marker.setLatLng(newLatLng);
+    //marker.setLatLng(newLatLng).update();
 }
 
 function addAirplaneIconToMap(latitude, longitude) {

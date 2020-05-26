@@ -33,6 +33,7 @@ namespace FlightControlWeb.Controllers
             string timePattern = "yyyy-MM-ddTHH:mm:ssZ";
             DateTime myTime = DateTime.Parse(relative_to);
             myTime = TimeZoneInfo.ConvertTimeToUtc(myTime);
+            //Console.WriteLine(myTime);
             //myTime = myTime.AddHours(-2);
             //DateTime relativeTo = DateTime.ParseExact(relative_to, timePattern, System.Globalization.CultureInfo.InvariantCulture);
             // Get all non extrernal flights.
@@ -281,6 +282,10 @@ namespace FlightControlWeb.Controllers
                 Latitude = latitudeResult,
                 Longitude = longitudeResult,
             };
+            //added by amit
+            //Console.WriteLine(myLocation.Latitude);
+            //Console.WriteLine(myLocation.Longitude);
+            //end of addition
             return myLocation;
         }
         public async void AddAllExternalFlightToDb(List<Flight> allExternalFlight, string severUrl)
