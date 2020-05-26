@@ -178,14 +178,14 @@ namespace FlightControlWeb.Controllers
             return allExternalFlights;
         }
 
-        public async Task<List<Flight>> GetExternalFlightsFromServer(Server myServer, string dateTime)
+        public  async Task<List<Flight>> GetExternalFlightsFromServer(Server myServer, string dateTime)
         {
             List<Flight> allExternalFlights = new List<Flight>();
             //string url = "https://";
             string url = "";
             url += myServer.ServerURL;
-            //url += "/api/Flights?relative_to=";
-            url += "Flights?relative_to=";
+            url += "/api/Flights?relative_to=";
+            //url += "Flights?relative_to=";
             //dateTime = dateTime.AddHours(2);
             //dateTime.ToString("yyyy-MM-dd HH':'mm':'ss");
             string date = dateTime.ToString();

@@ -1,10 +1,10 @@
-﻿let allMyFlightsUrl = "https://localhost:5001/api/Flights?relative_to=2020-05-25T10:30:00Z&sync_all";
+﻿//let allMyFlightsUrl = "https://localhost:5001/api/Flights?relative_to=2020-05-25T10:30:00Z&sync_all";
 let d = new Date();
 let utcString = d.toUTCString();
 let time = new Date(utcString);
 time = time.toISOString().slice(0, -2);
 
-//let allMyFlightsUrl = "https://localhost:5001/api/Flights?relative_to=" + time + "Z&sync_all";
+let allMyFlightsUrl = "https://localhost:5001/api/Flights?relative_to=" + time + "Z&sync_all";
 
 
 //function getAllFlights() {
