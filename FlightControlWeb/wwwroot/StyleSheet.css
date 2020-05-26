@@ -8,9 +8,9 @@
 }
 /* grid style */
 body {
-    margin: 30px;
-    /*background-image: url('pictures/wallpaper2.jpg');
-    background-position: center;*/
+    margin: 20px;
+    background-image: url('pictures/wallpaper2.jpg');
+    background-position: center;
 }
 
 .whole-container {
