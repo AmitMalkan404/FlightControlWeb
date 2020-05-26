@@ -142,9 +142,41 @@ function getFlights() {
                 flightsArray[i].iconExists = true;
             }
             moveMarker(flightsArray[i].getPlaneMarker(), jsonFlight.latitude, jsonFlight.longitude);
+            updateFlightDetails(flightsArray[i]);
+            checkExternalFlightExists(data, flightsArray);
             i++;
         });
     });
+}
+
+function checkExternalFlightExists(data, flightsArray) {
+    
+
+
+
+
+
+
+
+    //document.getElementById("myflightstable").deleteRow(rowIndex);
+    //removeMarkerFromMap(flightToDelete.planeMarker);
+
+    ////remove flight details
+    //if (details[1] === flightToDelete.id) {
+    //    removeFlightDetails();
+    //}
+
+    ////remove track if it belongs to this flight
+    //if (track[1] !== null && track[1] === flightToDelete.id) {
+    //    removeTrack();
+    }
+}
+
+function updateFlightDetails(flight) {
+    if (details[1] !== null) {
+        details[0].rows[1].cells[3].innerText = flight.latitude;
+        details[0].rows[1].cells[4].innerText = flight.longitude;
+    }
 }
 
 function addRowToTable(tableId, flight, jsonFlight) {
@@ -246,7 +278,7 @@ function deleteFlight(deleteButton, flightToDelete) {
             }
 
             //remove track if it belongs to this flight
-            if (track[0] !== null && track[1] === flightToDelete.id) {
+            if (track[1] !== null && track[1] === flightToDelete.id) {
                 removeTrack();
             }
 
@@ -258,4 +290,4 @@ function deleteFlight(deleteButton, flightToDelete) {
 }
 
 
-setInterval(getFlights, 3000);
+setInterval(getFlights, 500);
