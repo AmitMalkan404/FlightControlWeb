@@ -6,7 +6,6 @@
         this.iconExists = false;
         this.airline = company;
         this.planeMarker = null;
-        this.track = null;
         this.tableRow = null;
         this.isExternal = null;
         this.passengers = passengers;
@@ -147,49 +146,68 @@ function getFlights() {
             updateFlightDetails();
             i++;
         });
-        //updateExistingFlights(data, flightsArray);
+        updateExistingFlights(data, flightsArray);
     });
 }
 
+
 function updateExistingFlights(data, flightsArray) {
-    let j = 0, k = 0;
+    let j;
+    let active;
+    if (flightsArray.length === 0) {
+        return;
+    }
 
     for (j = 0; j < flightsArray.length; j++) {
-        let isExist = 0;
-        data.forEach(function (jsonFlight) {
-            if (flightsArray[j].id === jsonFlight[k].id) {
-                isExist = 1;
+        active = false;
+        
+        for (let jsonFlight of data) {
+            if (flightsArray[j].id === jsonFlight.flight_id) {
+                // the flight is active
+                active = true;
+                break;
             }
-            k++;
-        });
-        if (isExist === 0) {
-            if (flightsArray[j].isExternal === false) {
-                document.getElementById("myflightstable").deleteRow(
-                    flightsArray[j].tableRow.rowIndex);
-            }
-            else {
-                document.getElementById("externalFlightstable").deleteRow(
-                    flightsArray[j].tableRow.rowIndex);
-            }
-            removeMarkerFromMap(flightsArray[j].planeMarker);
+        }
 
-            //remove flight details
-            if (details[1].id === flightsArray[j].id) {
-                removeFlightDetails();
-            }
-
-            //remove track if it belongs to this flight
-            if (track[1] !== null && track[1] === flightsArray[j].id) {
-                removeTrack();
-            }
+        if (!active) {
+            removeExpiredFlight(flightsArray, j);
         }
     }
 }
 
+
+function removeExpiredFlight(flightsArray, j) {
+    let tableId;
+    if (flightsArray[j].isExternal === false) {
+        tableId = "myflightstable";
+        //document.getElementById("myflightstable").deleteRow(
+        //    flightsArray[j].tableRow.rowIndex);
+    }
+    else {
+        tableId = "externalFlightstable";
+        //document.getElementById("externalFlightstable").deleteRow(
+        //    flightsArray[j].tableRow.rowIndex);
+    }
+    document.getElementById(tableId).deleteRow(flightsArray[j].tableRow.rowIndex);
+    removeMarkerFromMap(flightsArray[j].planeMarker);
+
+    //remove flight details
+    if (details[1] != null && details[1].id === flightsArray[j].id) {
+        removeFlightDetails();
+    }
+
+    //remove track if it belongs to this flight
+    if (track[1] !== null && track[1] === flightsArray[j].id) {
+        removeTrack();
+    }
+    flightsArray.splice(j, 1);
+}
+
+
 function updateFlightDetails() {
     if (details[1] !== null) {
-        details[0].rows[1].cells[3].innerText = details[1].planeMarker._latlng.lat;
-        details[0].rows[1].cells[4].innerText = details[1].planeMarker._latlng.lng;
+        details[0].rows[1].cells[3].innerText = details[1].planeMarker._latlng.lat.toFixed(6);
+        details[0].rows[1].cells[4].innerText = details[1].planeMarker._latlng.lng.toFixed(6);
     }
 }
 
@@ -287,7 +305,7 @@ function deleteFlight(deleteButton, flightToDelete) {
             removeMarkerFromMap(flightToDelete.planeMarker);
 
             //remove flight details
-            if (details[1].id === flightToDelete.id) {
+            if (details[1] !== null && details[1].id === flightToDelete.id) {
                 removeFlightDetails();
             }
 
@@ -296,6 +314,8 @@ function deleteFlight(deleteButton, flightToDelete) {
                 removeTrack();
             }
 
+            let flightIndex = flightsArray.findIndex(flight => flight.id === flightToDelete.id);
+            flightsArray.splice(flightIndex, 1);
             console.log("flight deleted successfully");
         })
         .catch(() => { /* Error. Inform the user */
