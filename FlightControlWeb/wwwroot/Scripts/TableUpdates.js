@@ -1,4 +1,4 @@
-﻿//let allMyFlightsUrl = "https://localhost:5001/api/Flights?relative_to=2020-12-27T02:00:30Z&sync_all";
+﻿//let allMyFlightsUrl = "https://localhost:5001/api/Flights?relative_to=2020-05-25T10:30:00Z&sync_all";
 let d = new Date();
 let utcString = d.toUTCString();
 let time = new Date(utcString);

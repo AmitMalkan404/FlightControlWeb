@@ -55,6 +55,9 @@ namespace FlightControlWeb.Controllers
             }
             else
             {
+
+            }
+            {
                 return NotFound();
             }
         }
@@ -186,7 +189,8 @@ namespace FlightControlWeb.Controllers
         }
         public async Task<ActionResult<FlightPlanFullData>> GetExternalFlightFromServer(string myServerUrl,string id)
         {
-            string url = "https://";
+            //string url = "https://";
+            string url = "";
             url += myServerUrl;
             url += "/api/FlightPlans/" + id;
             HttpClient client = new HttpClient();

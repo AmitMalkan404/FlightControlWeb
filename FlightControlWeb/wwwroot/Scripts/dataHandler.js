@@ -1,5 +1,5 @@
 ﻿class Flight {
-    constructor(id, lat, lon, company, passengers) {
+    constructor(id, lat, lon, company) {
         this.id = id;
         this.latitude = lat;
         this.longitude = lon;
@@ -7,9 +7,8 @@
         this.airline = company;
         this.planeMarker = null;
         this.track = null;
-        this.tableRow = null;
-        this.isExternal = null;
-        this.passengers = passengers;
+        this.myFlightsRow = null;
+        
     }
 
     setPlaneMarker(marker) {
@@ -25,7 +24,7 @@
     }
 
     setMyFlightsRow(row) {
-        this.tableRow = row;
+        this.myFlightsRow = row;
     }
 
     getPlaneTrack() {
@@ -33,7 +32,7 @@
     }
 
     getMyFlightsRow() {
-        return this.tableRow;
+        return this.myFlightsRow;
     }
 
     getId() {
@@ -60,61 +59,26 @@ function isInFlightsArray(flight) {
 
 let flightsArray = new Array();
 let myFlightPlanUrl; 
-//let latlngs = new Array();
-let track = new Array(2).fill(null);
-let details = new Array(2).fill(null);
-details[0] = document.getElementById("flightDetails");
+let latlngs = new Array();
 
-function generateTrack(flightId) {
-    if (track[0] === null) {
-        let latlngs = new Array();
-        myFlightPlanUrl = "api/FlightPlans/" + flightId;
-
-        $.getJSON(myFlightPlanUrl, function (data) {
-            for (i = 0; i < data.segments.length; i++) {
-                latlngs[i] = new Array(data.segments[i].latitude, data.segments[i].longitude);
-            }
-            track[0] = mapLine(latlngs);
-            track[1] = flightId;
-        });
-    }
-}
-
-function removeTrack() {
-    if (track[0] !== null) {
-        removeMapLine(track[0]);
-        track[0] = null;
-        track[1] = null;
-    }
-}
-
-
-function linkRowDetailsTrack(marker, action) {
-    if (flightsArray.length !== 0) {
-        let i;
-        for (i = 0; i < flightsArray.length; i++) {
-            if (flightsArray[i].planeMarker === marker) {
-
-                let tableId;
-                if (flightsArray[i].isExternal === true) {
-                    tableId = "externalFlightstable";
-                } else {
-                    tableId = "myflightstable";
-                }
-
-                if (action === "link") {
-                    flightsArray[i].tableRow.style.backgroundColor = "lightgreen";
-                    generateFlightDetails(flightsArray[i]);
-                    generateTrack(flightsArray[i].id);
-
-                } else {
-                    flightsArray[i].tableRow.style.backgroundColor = "transparent";
-                    removeFlightDetails();
-                    removeTrack();
-                }
-            }
+function getlatlngs(flightsArray, arrayIndex) {
+    myFlightPlanUrl = "api/FlightPlans/" + flightsArray[arrayIndex].id;
+    
+   $.getJSON(myFlightPlanUrl, function (data) {
+        for (i = 0; i < data.segments.length; i++) {
+            latlngs[i] = new Array(data.segments[i].latitude, data.segments[i].longitude);
         }
-    }
+        flightsArray[arrayIndex].setPlaneTrack(mapLine(latlngs));
+
+        //console.log(flightsArray[arrayIndex].getPlaneTrack());
+
+        
+        //flightsArray[arrayIndex].setPlaneTrack = latlngs;
+    });
+
+    //console.log(flightsArray[arrayIndex].getPlaneTrack());
+    //mapLine(latlngs);
+
 }
 
 
@@ -123,112 +87,73 @@ let i = 0;
 function getFlights() {
 
     $.getJSON(allMyFlightsUrl, function (data) {
+        //console.log(data);
         data.forEach(function (jsonFlight) {
             if (!isInFlightsArray(jsonFlight)) {
-                flightsArray[i] = new Flight(jsonFlight.flight_id, jsonFlight.latitude, jsonFlight.longitude,
-                    jsonFlight.company_name, jsonFlight.passengers);
-
+                flightsArray[i] = new Flight(jsonFlight.flight_id, jsonFlight.latitude, jsonFlight.longitude, jsonFlight.company_name);
                 if (jsonFlight.is_external === false) {
-                    flightsArray[i].isExternal = false;
                     addRowToTable("myflightstable", flightsArray[i], jsonFlight);
                 } else {
-                    flightsArray[i].isExternal = true;
                     addRowToTable("externalFlightstable", flightsArray[i], jsonFlight);
                 }
+                addRowToTable("flightDetails", flightsArray[i], jsonFlight);
             }
-
             if (!flightsArray[i].iconExists) {
                 flightsArray[i].setPlaneMarker(addAirplaneIconToMap(jsonFlight.latitude, jsonFlight.longitude));
                 flightsArray[i].iconExists = true;
             }
             moveMarker(flightsArray[i].getPlaneMarker(), jsonFlight.latitude, jsonFlight.longitude);
+            getlatlngs(flightsArray, i);
+
             i++;
         });
     });
 }
 
+
 function addRowToTable(tableId, flight, jsonFlight) {
 
-    flight.tableRow = document.createElement("TR");
+    flight.myFlightsRow = document.createElement("TR");
+    document.getElementById(tableId).appendChild(flight.myFlightsRow);
 
-    flight.tableRow.style.cursor = "pointer";
-    flight.tableRow.style.height = "25px";
-
-    //flight.tableRow.addEventListener("click", function () {
-    //    onMarkerClick(flight.planeMarker);
-    //}, false);
-
-    document.getElementById(tableId).appendChild(flight.tableRow);
-
-    let flightId = flight.tableRow.insertCell(0);
+    let flightId = flight.myFlightsRow.insertCell(0);
     flightId.innerText = jsonFlight.flight_id;
-    ////////
-    flightId.addEventListener("click", function () {
-        onMarkerClick(flight.planeMarker);
-    }, false);
-    ////////
-    let airline = flight.tableRow.insertCell(1);
+    let airline = flight.myFlightsRow.insertCell(1);
     airline.innerText = jsonFlight.company_name;
-    ////////
-    airline.addEventListener("click", function () {
-        onMarkerClick(flight.planeMarker);
-    }, false);
-    ////////
+
     if (tableId === "myflightstable") {
         let btn = document.createElement('button');
-        btn.style.backgroundColor = "transparent";
-        btn.style.border = "transparent";
-
         let btnImage = document.createElement('img');
         btnImage.setAttribute("src", "Pictures/remove.png");
         btnImage.setAttribute("width", 25);
         btnImage.setAttribute("height", 25);
 
-        //btn.onclick = function() {
-        //    deleteFlight(this, flight);
-        //    return false;
-        //}
-        btn.appendChild(btnImage);
-        let removeCell = flight.tableRow.insertCell(2);
-        removeCell.appendChild(btn);
-        removeCell.onclick = function () {
+        btn.onclick = function() {
             deleteFlight(this, flight);
             return false;
         }
-        removeCell.style.backgroundColor = "red";
+
+        btn.appendChild(btnImage);
+        let removeCell = flight.myFlightsRow.insertCell(2);
+        removeCell.appendChild(btn);
+    }
+    else if (tableId === "flightDetails") {
+        let passengers = flight.myFlightsRow.insertCell(2);
+        passengers.innerText = jsonFlight.passengers;
+        let lat = flight.myFlightsRow.insertCell(3);
+        lat.innerHTML = jsonFlight.latitude;
+        let lon = flight.myFlightsRow.insertCell(4);
+        lon.innerHTML = jsonFlight.longitude;
     }
 }
 
-function generateFlightDetails(flight) {
-    if (details[1] === null) {
-        details[1] = flight.id;
-        let row = details[0].insertRow(1);
-        let flightId = row.insertCell(0);
-        flightId.innerText = flight.id;
-        let airline = row.insertCell(1);
-        airline.innerText = flight.airline;
-        let passengers = row.insertCell(2);
-        passengers.innerText = flight.passengers;
-        let lat = row.insertCell(3);
-        lat.innerText = flight.latitude.toFixed(6);
-        let lon = row.insertCell(4);
-        lon.innerText = flight.longitude.toFixed(6);
-    }
-}
-
-function removeFlightDetails() {
-    if (details[1] !== null) {
-        details[0].deleteRow(1);
-        details[1] = null;
-    }
-}
 
 function deleteFlight(deleteButton, flightToDelete) {
 
     let deleteFlightUrl = "api/Flights/" + flightToDelete.id;
 
-    //let rowIndex = deleteButton.parentNode.parentNode.rowIndex;
-    let rowIndex = deleteButton.parentNode.rowIndex;
+
+    let rowIndex = deleteButton.parentNode.parentNode.rowIndex;
 
     fetch(deleteFlightUrl,
         {
@@ -239,16 +164,7 @@ function deleteFlight(deleteButton, flightToDelete) {
             //delete row from flights table
             document.getElementById("myflightstable").deleteRow(rowIndex);
             removeMarkerFromMap(flightToDelete.planeMarker);
-
-            //remove flight details
-            if (details[1] === flightToDelete.id) {
-                removeFlightDetails();
-            }
-
-            //remove track if it belongs to this flight
-            if (track[0] !== null && track[1] === flightToDelete.id) {
-                removeTrack();
-            }
+            removeMapLine(flightToDelete.getPlaneTrack());
 
             console.log("flight deleted successfully");
         })
@@ -257,4 +173,5 @@ function deleteFlight(deleteButton, flightToDelete) {
         });
 }
 
-setInterval(getFlights, 500);
+
+setInterval(getFlights, 10000);
