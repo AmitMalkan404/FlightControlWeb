@@ -33,7 +33,7 @@ let clickedMarker = null;
 function releaseClick() {
     if (isMarkerClicked) {
         clickedMarker.setIcon(unselectedIcon);
-        linkRowAndDetails(clickedMarker, "unLink");
+        linkRowDetailsTrack(clickedMarker, "unLink");
         isMarkerClicked = false;
     }
 }
@@ -49,7 +49,7 @@ function onMarkerClick(marker) {
     marker.setIcon(selectedIcon);
     isMarkerClicked = true;
     clickedMarker = marker;
-    linkRowAndDetails(marker, "link");
+    linkRowDetailsTrack(marker, "link");
 }
 
 function moveMarker(marker, lat, lon) {
