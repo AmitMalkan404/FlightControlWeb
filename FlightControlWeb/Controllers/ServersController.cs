@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using FlightControlWeb.Models;
 using System.Text.Json;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace FlightControlWeb.Controllers
 {
@@ -26,7 +27,18 @@ namespace FlightControlWeb.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Server>>> GetServer()
         {
-            return await _context.Server.ToListAsync();
+            List<Server> serverList = new List<Server>();
+            var serverFromDb =  await _context.Server.ToListAsync();
+            foreach (var item in serverFromDb)
+            {
+                Server server = new Server
+                {
+                    ServerId = item.ServerId,
+                    ServerURL= item.ServerURL,
+                };
+                serverList.Add(server);
+            };
+            return serverList;
         }
 
         //// GET: api/Servers/5
@@ -84,12 +96,22 @@ namespace FlightControlWeb.Controllers
         {
             string stringJsonFlight = jsonFlight.ToString();
             dynamic jsonObj = JsonConvert.DeserializeObject(stringJsonFlight);
-            Server server = new Server()
+            Server server = CreateServer(jsonObj);
+            //Server server = new Server()
+            //{
+            //    ServerId = jsonObj["ServerId"],
+            //    ServerURL = jsonObj["ServerURL"],
+            //};
+
+            try
             {
-                ServerId = jsonObj["ServerId"],
-                ServerURL = jsonObj["ServerURL"],
-            };
-            _context.Server.Add(server);
+
+                _context.Server.Add(server);
+            }
+            catch
+            {
+                throw new ArgumentException("Failed to add the server. Check if the properties are written correctly.");
+            }
             try
             {
                 await _context.SaveChangesAsync();
@@ -113,21 +135,38 @@ namespace FlightControlWeb.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Server>> DeleteServer(string id)
         {
-            var server = await _context.Server.Where(x => x.ServerId == id).FirstAsync();
-            if (server == null)
+            try
             {
-                return NotFound();
+                var server = await _context.Server.Where(x => x.ServerId == id).FirstAsync();
+                _context.Server.Remove(server);
+                await _context.SaveChangesAsync();
+                return server;
+            } 
+            catch
+            {
+                throw new ArgumentException("Failed to remove the server. Check the server id again.");
             }
-
-            _context.Server.Remove(server);
-            await _context.SaveChangesAsync();
-
-            return server;
+            //await _context.SaveChangesAsync();
         }
 
         private bool ServerExists(string id)
         {
             return _context.Server.Any(e => e.ServerId == id);
+        }
+
+        Server CreateServer(JToken inupt)
+        {
+
+            Server server = new Server()
+            {
+                ServerId = (string)inupt["ServerId"],
+                ServerURL = (string)inupt["ServerURL"],
+            };
+            if (server.ServerId == "" || server.ServerURL == "")
+            {
+                return null;
+            }
+            return server;
         }
     }
 }

@@ -132,16 +132,17 @@ namespace FlightControlWeb.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<FlightPlan>> DeleteFlightPlan(string id)
         {
-            var flightPlan = await _context.FlightItems.Where(x => x.FlightId == id).FirstAsync();
-            if (flightPlan == null)
+            try
             {
-                return NotFound();
+                var flightPlan = await _context.FlightItems.Where(x => x.FlightId == id).FirstAsync();
+                _context.FlightItems.Remove(flightPlan);
+                await _context.SaveChangesAsync();
+                return flightPlan;
             }
-
-            _context.FlightItems.Remove(flightPlan);
-            await _context.SaveChangesAsync();
-
-            return flightPlan;
+            catch
+            {
+                throw new ArgumentException("Failed to delete the flight. Check the if the flight_id is correct.");
+            }
         }
 
         private bool FlightExists(long id)
@@ -171,9 +172,17 @@ namespace FlightControlWeb.Controllers
             List<Flight> allExternalFlights = new List<Flight>();
             for (int i = 0; i < allServers.Count; i++)
             {
-                List<Flight> tempFlights = await GetExternalFlightsFromServer(allServers[i], dateTime);
-                AddAllExternalFlightToDb(tempFlights, allServers[i].ServerURL);
-                allExternalFlights.AddRange(tempFlights);
+                try
+                {
+                    List<Flight> tempFlights = await GetExternalFlightsFromServer(allServers[i], dateTime);
+                    AddAllExternalFlightToDb(tempFlights, allServers[i].ServerURL);
+                    allExternalFlights.AddRange(tempFlights);
+                }
+                catch
+                {
+                    continue;
+                }
+
             }
             return allExternalFlights;
         }
@@ -191,26 +200,33 @@ namespace FlightControlWeb.Controllers
             string date = dateTime.ToString();
             url += date;
             HttpClient client = new HttpClient();
-            var response = await client.GetStringAsync(url);
-            string stringJsonFlight = response.ToString();
-            dynamic dJson = JsonConvert.DeserializeObject(stringJsonFlight);
-            foreach(var flight in dJson)
+            try
             {
-                JToken json = flight;
-                Segment segmentFlight = new Segment
+                var response = await client.GetStringAsync(url);
+                string stringJsonFlight = response.ToString();
+                dynamic dJson = JsonConvert.DeserializeObject(stringJsonFlight);
+                foreach (var flight in dJson)
                 {
-                    Latitude = flight["latitude"],
-                    Longitude = flight["longitude"],
-                };
-                int passengers = flight["passengers"];
-                string companyName = flight["company_name"];
-                string flightId = flight["flight_id"];
-                DateTime dateTimeFlight = flight["date_time"];
-                bool isExternalFlight = true;
-                Flight flightcreateFlight = CreateFlight(companyName, flightId, passengers, isExternalFlight, segmentFlight, dateTimeFlight);
-                allExternalFlights.Add(flightcreateFlight);
+                    JToken json = flight;
+                    Segment segmentFlight = new Segment
+                    {
+                        Latitude = flight["latitude"],
+                        Longitude = flight["longitude"],
+                    };
+                    int passengers = flight["passengers"];
+                    string companyName = flight["company_name"];
+                    string flightId = flight["flight_id"];
+                    DateTime dateTimeFlight = flight["date_time"];
+                    bool isExternalFlight = true;
+                    Flight flightcreateFlight = CreateFlight(companyName, flightId, passengers, isExternalFlight, segmentFlight, dateTimeFlight);
+                    allExternalFlights.Add(flightcreateFlight);
+                }
+                return allExternalFlights;
             }
-            return allExternalFlights;
+            catch
+            {
+                throw new ArgumentException();
+            }
         }
 
         public Segment GetMyLocation(DbSet<Segment> contextSegment, double longitude, double latitude, DateTime initialDateTime, string flightId, DateTime relativeTo)
