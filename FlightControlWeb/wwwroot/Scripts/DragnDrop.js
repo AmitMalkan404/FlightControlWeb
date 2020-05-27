@@ -48,13 +48,46 @@ function uploadFile(file) {
             {
                 method: 'POST',
                 body: file
-            })
-        //Here i should use the server or services!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        .then(() => { /* Done. Inform the user */
-            
-            //get latitude and longitude before.
         })
-        .catch(() => { /* Error. Inform the user */
-            console.log("oops");
+    .then((response) => {
+            if (response.status === 200) { // Or what ever you want to check
+                return Promise.resolve(response.json()); // This will end up in SUCCESS part
+        }
+        console.log(response);
+        console.log(response.json());
+            return Promise.resolve(response.json()).then((responseInJson) => { // This will end up in ERROR part
+                return Promise.reject(responseInJson.message); //  responseInJson.message = "Some nasty error message!"
+            });
+        })
+        .then((result) => { // SUCCESS part
+                console.log("Success: ", result); // Response from api in json
+            },
+            (error) => { // ERROR part
+                // Because we rejected responseInJson.message, error will contain message from api. In this case "Some nasty error message!"
+                console.log("Error: ", error);
+            })
+        .catch(catchError => {
+            console.log("Catch: ", catchError);
         });
+
+
+    ////Here i should use the server or services!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //.then(function (response) {                      // first then()
+    //    if (response.ok) {
+    //        console.log("file updated on server side");
+    //        return;
+    //    }
+    //    console.log(response.fail);
+
+    //    throw new Error(response.fail);
+
+    //})
+    //.catch(function (error) {                        // catch
+    //    console.log('Request failed', error.message);
+    //});
+
+
+    //.catch(() => { /* Error. Inform the user */
+    //    console.log();
+    //});
 }
