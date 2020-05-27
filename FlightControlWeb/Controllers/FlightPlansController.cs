@@ -51,6 +51,7 @@ namespace FlightControlWeb.Controllers
             try
             {
                 var flightPlan2 = await CheckFlightPlanInServers(id);
+                return flightPlan2;
 
             }
             catch
@@ -69,7 +70,6 @@ namespace FlightControlWeb.Controllers
             //{
             //    return NotFound();
             //}
-            return NotFound();
         }
 
         //// PUT: api/FlightPlans/5
@@ -159,21 +159,21 @@ namespace FlightControlWeb.Controllers
             }
         }
 
-        // DELETE: api/FlightPlans/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<FlightPlan>> DeleteFlightPlan(string flightId)
-        {
-            var flightPlan = await _context.FlightItems.Where(x => x.FlightId == flightId).FirstAsync();
-            if (flightPlan == null)
-            {
-                return NotFound();
-            }
+        //// DELETE: api/FlightPlans/5
+        //[HttpDelete("{id}")]
+        //public async Task<ActionResult<FlightPlan>> DeleteFlightPlan(string flightId)
+        //{
+        //    var flightPlan = await _context.FlightItems.Where(x => x.FlightId == flightId).FirstAsync();
+        //    if (flightPlan == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            _context.FlightItems.Remove(flightPlan);
-            await _context.SaveChangesAsync();
+        //    _context.FlightItems.Remove(flightPlan);
+        //    await _context.SaveChangesAsync();
 
-            return flightPlan;
-        }
+        //    return flightPlan;
+        //}
 
         private bool FlightPlanExists(long id)
         {
@@ -244,7 +244,6 @@ namespace FlightControlWeb.Controllers
             double longitude = json["initial_location"]["longitude"];
             double latitude = json["initial_location"]["latitude"];
             int passengers = json["passengers"];
-            string flightId = SetFlightId(companyName);
             DateTime dateTime = json["initial_location"]["date_time"];
             if (companyName == "")
             {
@@ -264,6 +263,7 @@ namespace FlightControlWeb.Controllers
             
             if (!isExternal)
             {
+                string flightId = SetFlightId(companyName);
                 flightPlan.Passengers = passengers;
                 flightPlan.CompanyName = companyName;
                 flightPlan.Longitude = longitude;
@@ -303,7 +303,7 @@ namespace FlightControlWeb.Controllers
                 InitialLocation = initialLocation,
                 Segments = segments,
             };
-
+            flightPlanFullData.FlightId = flightId;
             return flightPlanFullData;
         }
         public List<Segment> CheckValidSegments(dynamic checkSegmentsList, string flightId,bool isExternal)

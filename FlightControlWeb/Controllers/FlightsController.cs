@@ -128,26 +128,26 @@ namespace FlightControlWeb.Controllers
         //    return CreatedAtAction("GetFlight", new { id = flight.Id }, flight);
         //}
 
-        //// DELETE: api/Flights/5
-        //[HttpDelete("{id}")]
-        //public async Task<ActionResult<FlightPlan>> DeleteFlightPlan(string id)
-        //{
-        //    var flightPlan = await _context.FlightItems.Where(x => x.FlightId == id).FirstAsync();
-        //    if (flightPlan == null)
-        //    {
-        //        return NotFound();
-        //    }
+        // DELETE: api/Flights/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<FlightPlan>> DeleteFlightPlan(string id)
+        {
+            var flightPlan = await _context.FlightItems.Where(x => x.FlightId == id).FirstAsync();
+            if (flightPlan == null)
+            {
+                return NotFound();
+            }
 
-        //    _context.FlightItems.Remove(flightPlan);
-        //    await _context.SaveChangesAsync();
+            _context.FlightItems.Remove(flightPlan);
+            await _context.SaveChangesAsync();
 
-        //    return flightPlan;
-        //}
+            return flightPlan;
+        }
 
-        //private bool FlightExists(long id)
-        //{
-        //    return _context.Flight.Any(e => e.Id == id);
-        //}
+        private bool FlightExists(long id)
+        {
+            return _context.Flight.Any(e => e.Id == id);
+        }
 
 
         public Flight CreateFlight(string companyName, string flightId, int passengers, bool isExternal, Segment location, DateTime relativeTo)

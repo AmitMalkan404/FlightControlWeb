@@ -14,7 +14,7 @@ namespace FlightControlWeb.Models
 		public string FlightId { get; set; }
 		[JsonPropertyName("passengers")]
 		public int Passengers { get; set; }
-		[JsonPropertyName("comapny_name")]
+		[JsonPropertyName("company_name")]
 		public string CompanyName { get; set; }
 		[JsonPropertyName("longitude")]
 		public double Longitude { get; set; }
