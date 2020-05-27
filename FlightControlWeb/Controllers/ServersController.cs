@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using FlightControlWeb.Models;
 using System.Text.Json;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace FlightControlWeb.Controllers
 {
@@ -89,6 +90,15 @@ namespace FlightControlWeb.Controllers
                 ServerId = jsonObj["ServerId"],
                 ServerURL = jsonObj["ServerURL"],
             };
+            try
+            {
+                bool validServer = CheckValidServer(server);
+                _context.Server.Add(server);
+            }
+            catch
+            {
+                throw new ArgumentException("One of the server details is not in a correct format. Please try again.");
+            }
             _context.Server.Add(server);
             try
             {
@@ -96,14 +106,11 @@ namespace FlightControlWeb.Controllers
             }
             catch (DbUpdateException)
             {
-                if (ServerExists(server.ServerId))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                return Conflict();
+                //else
+                //{
+                //    throw;
+                //}
             }
 
             return CreatedAtAction("GetServer", new { id = server.ServerId }, server);
@@ -128,6 +135,14 @@ namespace FlightControlWeb.Controllers
         private bool ServerExists(string id)
         {
             return _context.Server.Any(e => e.ServerId == id);
+        }
+        public bool CheckValidServer(Server server)
+        {
+            if ((server.ServerURL == "") || server.ServerId == "")
+            {
+                throw new ArgumentException("One of the server details is not in a correct format. Please try again.");
+            }
+            return true;
         }
     }
 }

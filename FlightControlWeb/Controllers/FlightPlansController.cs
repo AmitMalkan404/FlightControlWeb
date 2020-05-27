@@ -48,51 +48,62 @@ namespace FlightControlWeb.Controllers
                     flightPlan.Latitude, flightPlan.Longitude, flightPlan.Passengers, flightPlan.FlightId,isExternal,segmentList);
                 return flightPlanFullData;
             }
-            var flightPlan2 = await CheckFlightPlanInServers(id);
-            if (flightPlan2 != null)
-            {
-                return flightPlan2;
-            }
-            else
-            {
-
-            }
-            {
-                return NotFound();
-            }
-        }
-
-        // PUT: api/FlightPlans/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutFlightPlan(long id, FlightPlan flightPlan)
-        {
-            if (id != flightPlan.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(flightPlan).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!FlightPlanExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                var flightPlan2 = await CheckFlightPlanInServers(id);
 
-            return NoContent();
+            }
+            catch
+            {
+                throw;
+            }
+            //catch
+            //{
+            //    throw new ArgumentException("This is an external flightPlan. Something went wrong with its server.");
+            //}
+            //if (flightPlan2 != null)
+            //{
+            //    return flightPlan2;
+            //}
+            //else
+            //{
+            //    return NotFound();
+            //}
+            return NotFound();
         }
+
+        //// PUT: api/FlightPlans/5
+        //// To protect from overposting attacks, enable the specific properties you want to bind to, for
+        //// more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutFlightPlan(long id, FlightPlan flightPlan)
+        //{
+        //    if (id != flightPlan.Id)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    _context.Entry(flightPlan).State = EntityState.Modified;
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        return NotFound();
+        //        //if (!FlightPlanExists(id))
+        //        //{
+        //        //    return NotFound();
+        //        //}
+        //        //else
+        //        //{
+        //        //    throw;
+        //        //}
+        //    }
+
+        //    return NoContent();
+        //}
 
         // POST: api/FlightPlans
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
@@ -100,45 +111,52 @@ namespace FlightControlWeb.Controllers
         [HttpPost]
         public async Task<ActionResult<FlightPlan>> PostFlightPlan([FromBody] JsonElement jsonFlight)
         {
-            FlightPlan flightPlan = new FlightPlan();
-            string stringJsonFlight = jsonFlight.ToString();
-            dynamic jsonObj = JsonConvert.DeserializeObject(stringJsonFlight);
-            //long id;
-            int passengers = jsonObj["passengers"];
-            string companyName = jsonObj["company_name"];
-            string flightId = SetFlightId(companyName);
-            double longitude = jsonObj["initial_location"]["longitude"];
-            double latitude = jsonObj["initial_location"]["latitude"];
-            DateTime dateTime = jsonObj["initial_location"]["date_time"];
-            bool isExternal = false;
-            flightPlan.Passengers = passengers;
-            flightPlan.CompanyName = companyName;
-            flightPlan.Longitude = longitude;
-            flightPlan.Latitude = latitude;
-            flightPlan.IsExternal = isExternal;
-            flightPlan.DateTime = dateTime;
-            flightPlan.FlightId = flightId;
-            dynamic segments = jsonObj["segments"];
-            List<Segment> segmentList = new List<Segment>();
-            foreach (var seg in segments)
+            try
             {
-                Segment newSeg = new Segment();
-                newSeg.Longitude = seg["longitude"];
-                newSeg.Latitude = seg["latitude"];
-                newSeg.TimespanSeconds = seg["timespan_seconds"];
-                newSeg.FlightId = flightId;
+                string stringJsonFlight = jsonFlight.ToString();
+                dynamic jsonObj = JsonConvert.DeserializeObject(stringJsonFlight);
+                //long id;
+                FlightPlan flightPlan = CheckValidFlightPlan(jsonObj, false);
+                //int passengers = jsonObj["passengers"];
+                //string companyName = jsonObj["company_name"];
+                //string flightId = SetFlightId(companyName);
+                //double longitude = jsonObj["initial_location"]["longitude"];
+                //double latitude = jsonObj["initial_location"]["latitude"];
+                //DateTime dateTime = jsonObj["initial_location"]["date_time"];
+                //bool isExternal = false;
+                //flightPlan.Passengers = passengers;
+                //flightPlan.CompanyName = companyName;
+                //flightPlan.Longitude = longitude;
+                //flightPlan.Latitude = latitude;
+                //flightPlan.IsExternal = isExternal;
+                //flightPlan.DateTime = dateTime;
+                //flightPlan.FlightId = flightId;
+                dynamic segments = jsonObj["segments"];
+                List<Segment> segmentList = CheckValidSegments(segments, flightPlan.FlightId, false);
+                //foreach (var seg in segments)
                 //{
-                //    Longitude = seg["longitude"],
-                //    Latitude = seg["latitude"],
-                //    TimespanSeconds = seg["timespan_seconds"],
-                //};
-                _context.Add(newSeg);
-            }
-            _context.FlightItems.Add(flightPlan);
-            await _context.SaveChangesAsync();
+                //    Segment newSeg = new Segment();
+                //    newSeg.Longitude = seg["longitude"];
+                //    newSeg.Latitude = seg["latitude"];
+                //    newSeg.TimespanSeconds = seg["timespan_seconds"];
+                //    newSeg.FlightId = flightId;
+                //    //{
+                //    //    Longitude = seg["longitude"],
+                //    //    Latitude = seg["latitude"],
+                //    //    TimespanSeconds = seg["timespan_seconds"],
+                //    //};
+                //    _context.Add(newSeg);
+                //}
+                _context.FlightItems.Add(flightPlan);
+                await _context.SaveChangesAsync();
 
-            //return CreatedAtAction("GetFlightPlan", new { id = flightPlan.Id }, flightPlan); 
-            return CreatedAtAction(nameof(GetFlightPlan), new { id = flightPlan.Id }, flightPlan);
+                //return CreatedAtAction("GetFlightPlan", new { id = flightPlan.Id }, flightPlan); 
+                return CreatedAtAction(nameof(GetFlightPlan), new { id = flightPlan.Id }, flightPlan);
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         // DELETE: api/FlightPlans/5
@@ -175,17 +193,19 @@ namespace FlightControlWeb.Controllers
 
         public async Task<ActionResult<FlightPlanFullData>> CheckFlightPlanInServers(string id)
         {
-
             FlightByServerId serverUrl = await _context.FlightByServerIds.Where(x => x.FlightId == id).FirstAsync();
-            //var flightByServerId = from flight in _context.FlightByServerIds where flight.FlightId == id select flight;
-
-            var flightPlan = await GetExternalFlightFromServer(serverUrl.ServerId, id);
-            if( flightPlan != null)
+            if(serverUrl == null)
             {
-                return flightPlan;
+                return NotFound();
             }
-
-            return null;
+            //var flightByServerId = from flight in _context.FlightByServerIds where flight.FlightId == id select flight;
+            var flightPlan = await GetExternalFlightFromServer(serverUrl.ServerId, id);
+            return flightPlan;
+            //catch
+            //{
+            //    throw new ArgumentException("This is an external flightPlan. Something went wrong with its server.");
+            //}
+            //return null;
         }
         public async Task<ActionResult<FlightPlanFullData>> GetExternalFlightFromServer(string myServerUrl,string id)
         {
@@ -195,12 +215,15 @@ namespace FlightControlWeb.Controllers
             url += "/api/FlightPlans/" + id;
             HttpClient client = new HttpClient();
             var response = await client.GetStringAsync(url);
-            if (response == null) { 
-               return null;
+            if (response == null)
+            {
+                throw new ArgumentException("This is an external flightPlan. Something went wrong with its server.");
             }
             string stringJsonFlight = response.ToString();
-            dynamic json = JsonConvert.DeserializeObject<FlightPlan>(stringJsonFlight);
+            dynamic json = JsonConvert.DeserializeObject(stringJsonFlight);
+
             FlightPlanFullData flightPlanFullData = new FlightPlanFullData();
+            FlightPlan fp = CheckValidFlightPlan(json,true);
             int passengers = json["passengers"];
             string companyName = json["company_name"];
             string flightId = json["flight_id"];
@@ -209,19 +232,49 @@ namespace FlightControlWeb.Controllers
             DateTime dateTime = json["initial_location"]["date_time"];
             bool isExternal = true;
             dynamic segments = json["segments"];
-            List<Segment> segmentList = new List<Segment>();
-            foreach (var seg in segments)
-            {
-                Segment newSeg = new Segment();
-                newSeg.Longitude = seg["longitude"];
-                newSeg.Latitude = seg["latitude"];
-                newSeg.TimespanSeconds = seg["timespan_seconds"];
-                newSeg.FlightId = flightId;
-                segmentList.Add(newSeg);
-            }
+            List<Segment> segmentList = CheckValidSegments(segments, flightId,true);
             flightPlanFullData = CreateFlightPlanFullData(companyName, dateTime, latitude, longitude, passengers, flightId, isExternal, segmentList);
             return flightPlanFullData;
         }
+
+        public FlightPlan CheckValidFlightPlan(dynamic json,bool isExternal)
+        {
+            FlightPlan flightPlan = new FlightPlan();
+            string companyName = json["company_name"];
+            double longitude = json["initial_location"]["longitude"];
+            double latitude = json["initial_location"]["latitude"];
+            int passengers = json["passengers"];
+            string flightId = SetFlightId(companyName);
+            DateTime dateTime = json["initial_location"]["date_time"];
+            if (companyName == "")
+            {
+                //return false;
+                throw new ArgumentException("Missing company name.");
+            }
+            if (longitude < -90 || longitude > 90)
+            {
+                //return false;
+                throw new ArgumentException("initial_location:Longitude value is not valid.");
+            }
+            if (latitude < -180 || latitude > 180)
+            {
+                //return false;
+                throw new ArgumentException("initial_location:Latitude value is not valid.");
+            }
+            
+            if (!isExternal)
+            {
+                flightPlan.Passengers = passengers;
+                flightPlan.CompanyName = companyName;
+                flightPlan.Longitude = longitude;
+                flightPlan.Latitude = latitude;
+                flightPlan.IsExternal = isExternal;
+                flightPlan.DateTime = dateTime;
+                flightPlan.FlightId = flightId;
+            }
+            return flightPlan;
+        }
+
         // if something gets stuck - change back to async task...
         public FlightPlanFullData CreateFlightPlanFullData(string companyName, DateTime dateTime,
                     double latitude, double longitude, int passengers, string flightId, bool isExternal, List<Segment> segmentList)
@@ -252,6 +305,77 @@ namespace FlightControlWeb.Controllers
             };
 
             return flightPlanFullData;
+        }
+        public List<Segment> CheckValidSegments(dynamic checkSegmentsList, string flightId,bool isExternal)
+        {
+            List<Segment> segmentList = new List<Segment>();
+            int i = 0;
+            foreach (var seg in checkSegmentsList)
+            {
+                Segment newSeg = CheckEachSegment(seg, flightId, isExternal, i);
+                //newSeg.Longitude = seg["longitude"];
+                //newSeg.Latitude = seg["latitude"];
+                //newSeg.TimespanSeconds = seg["timespan_seconds"];
+                //newSeg.FlightId = flightId;
+                segmentList.Add(newSeg);
+                i++;
+            }
+            return segmentList;
+            //try
+            //{
+            //    List<Segment> segmentList = new List<Segment>();
+            //    int i = 0;
+            //    foreach (var seg in checkSegmentsList)
+            //    {
+            //        Segment newSeg = CheckEachSegment(seg, flightId, isExternal, i);
+            //        //newSeg.Longitude = seg["longitude"];
+            //        //newSeg.Latitude = seg["latitude"];
+            //        //newSeg.TimespanSeconds = seg["timespan_seconds"];
+            //        //newSeg.FlightId = flightId;
+            //        segmentList.Add(newSeg);
+            //        i++;
+            //    }
+            //    return segmentList;
+            //}
+            //catch
+            //{
+            //    throw;
+            //}
+
+        }
+        public Segment CheckEachSegment(dynamic seg,string flightId,bool isExternal, int numSegment)
+        {
+            
+            double longitude = seg["longitude"];
+            double latitude = seg["latitude"];
+            double timeSpan = seg["timespan_seconds"];
+            if (longitude < -90 || longitude > 90)
+            {
+                //return false;
+                throw new ArgumentException("Longitude value is not valid in segment" + numSegment);
+            }
+            if (latitude < -180 || latitude > 180)
+            {
+                //return false;
+                throw new ArgumentException("Latitude value is not valid.");
+            }
+            if (timeSpan < 0)
+            {
+                //return false;
+                throw new ArgumentException("TimeSpan Seconds value is lower then 0.");
+            }
+            Segment newSeg = new Segment();
+            {
+                newSeg.Longitude = longitude;
+                newSeg.Latitude = latitude;
+                newSeg.TimespanSeconds = timeSpan;
+                newSeg.FlightId = flightId;
+            }
+            if (!isExternal)
+            {
+                _context.Segment.Add(newSeg);
+            }
+            return newSeg;
         }
     }
 }

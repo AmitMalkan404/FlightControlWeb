@@ -63,26 +63,26 @@ namespace FlightControlWeb.Controllers
         }
 
 
-        // GET: api/Flights/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Flight>> GetFlight(string id)
-        {
-            FlightPlan flightPlan = await _context.FlightItems.Where(x => x.FlightId == id).FirstAsync();
-            Segment resultSegment;
-            DateTime relativeTo = new DateTime(2009, 8, 1, 0, 0, 0);
-            //var flightPlan = await _context.FlightItems.FindAsync(id);
+        //// GET: api/Flights/5
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<Flight>> GetFlight(string id)
+        //{
+        //    FlightPlan flightPlan = await _context.FlightItems.Where(x => x.FlightId == id).FirstAsync();
+        //    Segment resultSegment;
+        //    DateTime relativeTo = new DateTime(2009, 8, 1, 0, 0, 0);
+        //    //var flightPlan = await _context.FlightItems.FindAsync(id);
 
-            if (flightPlan == null)
-            {
-                return NotFound();
-            }
-            // need to use the func and get a segment with the longitude and the latitude.
-            resultSegment = GetMyLocation(_context.Segment, flightPlan.Longitude, flightPlan.Latitude, flightPlan.DateTime, flightPlan.FlightId, relativeTo);
-            Flight myflight = CreateFlight(flightPlan.CompanyName, flightPlan.FlightId, flightPlan.Passengers, flightPlan.IsExternal, resultSegment, relativeTo);
-            //myflight.Longitude = resultSegment.Latitude;
-            //myflight.Latitude = resultSegment.Latitude;
-            return myflight;
-        }
+        //    if (flightPlan == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    // need to use the func and get a segment with the longitude and the latitude.
+        //    resultSegment = GetMyLocation(_context.Segment, flightPlan.Longitude, flightPlan.Latitude, flightPlan.DateTime, flightPlan.FlightId, relativeTo);
+        //    Flight myflight = CreateFlight(flightPlan.CompanyName, flightPlan.FlightId, flightPlan.Passengers, flightPlan.IsExternal, resultSegment, relativeTo);
+        //    //myflight.Longitude = resultSegment.Latitude;
+        //    //myflight.Latitude = resultSegment.Latitude;
+        //    return myflight;
+        //}
 
         //// PUT: api/Flights/5
         //// To protect from overposting attacks, enable the specific properties you want to bind to, for
@@ -128,26 +128,26 @@ namespace FlightControlWeb.Controllers
         //    return CreatedAtAction("GetFlight", new { id = flight.Id }, flight);
         //}
 
-        // DELETE: api/Flights/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<FlightPlan>> DeleteFlightPlan(string id)
-        {
-            var flightPlan = await _context.FlightItems.Where(x => x.FlightId == id).FirstAsync();
-            if (flightPlan == null)
-            {
-                return NotFound();
-            }
+        //// DELETE: api/Flights/5
+        //[HttpDelete("{id}")]
+        //public async Task<ActionResult<FlightPlan>> DeleteFlightPlan(string id)
+        //{
+        //    var flightPlan = await _context.FlightItems.Where(x => x.FlightId == id).FirstAsync();
+        //    if (flightPlan == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            _context.FlightItems.Remove(flightPlan);
-            await _context.SaveChangesAsync();
+        //    _context.FlightItems.Remove(flightPlan);
+        //    await _context.SaveChangesAsync();
 
-            return flightPlan;
-        }
+        //    return flightPlan;
+        //}
 
-        private bool FlightExists(long id)
-        {
-            return _context.Flight.Any(e => e.Id == id);
-        }
+        //private bool FlightExists(long id)
+        //{
+        //    return _context.Flight.Any(e => e.Id == id);
+        //}
 
 
         public Flight CreateFlight(string companyName, string flightId, int passengers, bool isExternal, Segment location, DateTime relativeTo)
@@ -180,37 +180,49 @@ namespace FlightControlWeb.Controllers
 
         public  async Task<List<Flight>> GetExternalFlightsFromServer(Server myServer, string dateTime)
         {
-            List<Flight> allExternalFlights = new List<Flight>();
-            //string url = "https://";
-            string url = "";
-            url += myServer.ServerURL;
-            url += "/api/Flights?relative_to=";
-            //url += "Flights?relative_to=";
-            //dateTime = dateTime.AddHours(2);
-            //dateTime.ToString("yyyy-MM-dd HH':'mm':'ss");
-            string date = dateTime.ToString();
-            url += date;
-            HttpClient client = new HttpClient();
-            var response = await client.GetStringAsync(url);
-            string stringJsonFlight = response.ToString();
-            dynamic dJson = JsonConvert.DeserializeObject(stringJsonFlight);
-            foreach(var flight in dJson)
+            try
             {
-                JToken json = flight;
-                Segment segmentFlight = new Segment
+                List<Flight> allExternalFlights = new List<Flight>();
+                //string url = "https://";
+                string url = "";
+                url += myServer.ServerURL;
+                url += "/api/Flights?relative_to=";
+                //url += "Flights?relative_to=";
+                //dateTime = dateTime.AddHours(2);
+                //dateTime.ToString("yyyy-MM-dd HH':'mm':'ss");
+                string date = dateTime.ToString();
+                url += date;
+                HttpClient client = new HttpClient();
+                var response = await client.GetStringAsync(url);
+                string stringJsonFlight = response.ToString();
+                dynamic dJson = JsonConvert.DeserializeObject(stringJsonFlight);
+                foreach (var flight in dJson)
                 {
-                    Latitude = flight["latitude"],
-                    Longitude = flight["longitude"],
-                };
-                int passengers = flight["passengers"];
-                string companyName = flight["company_name"];
-                string flightId = flight["flight_id"];
-                DateTime dateTimeFlight = flight["date_time"];
-                bool isExternalFlight = true;
-                Flight flightcreateFlight = CreateFlight(companyName, flightId, passengers, isExternalFlight, segmentFlight, dateTimeFlight);
-                allExternalFlights.Add(flightcreateFlight);
+                    if (!CheckValidFlightDetails(flight))
+                    {
+                        continue;
+                    }
+                    JToken json = flight;
+                    Segment segmentFlight = new Segment
+                    {
+                        Latitude = flight["latitude"],
+                        Longitude = flight["longitude"],
+                    };
+                    int passengers = flight["passengers"];
+                    string companyName = flight["company_name"];
+                    string flightId = flight["flight_id"];
+                    DateTime dateTimeFlight = flight["date_time"];
+                    bool isExternalFlight = true;
+                    Flight flightcreateFlight = CreateFlight(companyName, flightId, passengers, isExternalFlight, segmentFlight, dateTimeFlight);
+                    allExternalFlights.Add(flightcreateFlight);
+                }
+                return allExternalFlights;
             }
-            return allExternalFlights;
+            catch
+            {
+                return null;
+            }
+
         }
 
         public Segment GetMyLocation(DbSet<Segment> contextSegment, double longitude, double latitude, DateTime initialDateTime, string flightId, DateTime relativeTo)
@@ -285,6 +297,10 @@ namespace FlightControlWeb.Controllers
         }
         public async void AddAllExternalFlightToDb(List<Flight> allExternalFlight, string severUrl)
         {
+            if(allExternalFlight == null)
+            {
+                return;
+            }
             foreach (Flight flight in allExternalFlight)
             {
                 FlightByServerId flightToDb = new FlightByServerId
@@ -295,6 +311,25 @@ namespace FlightControlWeb.Controllers
                 _context.FlightByServerIds.Add(flightToDb);
                 await _context.SaveChangesAsync();
             }
+        }
+        bool CheckValidFlightDetails(dynamic flight)
+        {
+            double latitude = flight["latitude"];
+            double longitude = flight["longitude"];
+            string companyName = flight["company_name"];
+            if(companyName == "")
+            {
+                return false;
+            }
+            if(longitude < -90 || longitude > 90)
+            {
+                return false;
+            }
+            if (latitude < -180 || latitude > 180)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

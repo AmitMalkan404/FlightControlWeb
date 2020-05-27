@@ -169,7 +169,7 @@ function checkExternalFlightExists(data, flightsArray) {
     ////remove track if it belongs to this flight
     //if (track[1] !== null && track[1] === flightToDelete.id) {
     //    removeTrack();
-    }
+    //}
 }
 
 function updateFlightDetails(flight) {
