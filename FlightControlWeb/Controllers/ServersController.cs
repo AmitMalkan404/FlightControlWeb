@@ -27,18 +27,7 @@ namespace FlightControlWeb.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Server>>> GetServer()
         {
-            List<Server> serverList = new List<Server>();
-            var serverFromDb =  await _context.Server.ToListAsync();
-            foreach (var item in serverFromDb)
-            {
-                Server server = new Server
-                {
-                    ServerId = item.ServerId,
-                    ServerURL= item.ServerURL,
-                };
-                serverList.Add(server);
-            };
-            return serverList;
+            return await _context.Server.ToListAsync();
         }
 
         //// GET: api/Servers/5
@@ -96,36 +85,32 @@ namespace FlightControlWeb.Controllers
         {
             string stringJsonFlight = jsonFlight.ToString();
             dynamic jsonObj = JsonConvert.DeserializeObject(stringJsonFlight);
-            Server server = CreateServer(jsonObj);
-            //Server server = new Server()
-            //{
-            //    ServerId = jsonObj["ServerId"],
-            //    ServerURL = jsonObj["ServerURL"],
-            //};
-
+            Server server = new Server()
+            {
+                ServerId = jsonObj["ServerId"],
+                ServerURL = jsonObj["ServerURL"],
+            };
             try
             {
-
+                bool validServer = CheckValidServer(server);
                 _context.Server.Add(server);
             }
             catch
             {
-                throw new ArgumentException("Failed to add the server. Check if the properties are written correctly.");
+                throw new ArgumentException("One of the server details is not in a correct format. Please try again.");
             }
+            _context.Server.Add(server);
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (ServerExists(server.ServerId))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                return Conflict();
+                //else
+                //{
+                //    throw;
+                //}
             }
 
             return CreatedAtAction("GetServer", new { id = server.ServerId }, server);
@@ -135,38 +120,29 @@ namespace FlightControlWeb.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Server>> DeleteServer(string id)
         {
-            try
+            var server = await _context.Server.Where(x => x.ServerId == id).FirstAsync();
+            if (server == null)
             {
-                var server = await _context.Server.Where(x => x.ServerId == id).FirstAsync();
-                _context.Server.Remove(server);
-                await _context.SaveChangesAsync();
-                return server;
-            } 
-            catch
-            {
-                throw new ArgumentException("Failed to remove the server. Check the server id again.");
+                return NotFound();
             }
-            //await _context.SaveChangesAsync();
+
+            _context.Server.Remove(server);
+            await _context.SaveChangesAsync();
+
+            return server;
         }
 
         private bool ServerExists(string id)
         {
             return _context.Server.Any(e => e.ServerId == id);
         }
-
-        Server CreateServer(JToken inupt)
+        public bool CheckValidServer(Server server)
         {
-
-            Server server = new Server()
+            if ((server.ServerURL == "") || server.ServerId == "")
             {
-                ServerId = (string)inupt["ServerId"],
-                ServerURL = (string)inupt["ServerURL"],
-            };
-            if (server.ServerId == "" || server.ServerURL == "")
-            {
-                return null;
+                throw new ArgumentException("One of the server details is not in a correct format. Please try again.");
             }
-            return server;
+            return true;
         }
     }
 }
