@@ -11,7 +11,7 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 
 //Added by Amit
 let unselectedIcon = L.icon({
-    iconUrl: "Pictures/unselectedIcon.png" ,
+    iconUrl: "Pictures/unselectedIcon.png",
     iconSize: [55, 55],
     iconAnchor: [0, 0]
 });
@@ -55,8 +55,8 @@ function onMarkerClick(marker) {
 function moveMarker(marker, lat, lon) {
 
     let newLatLng = new L.LatLng(lat, lon);
-    //marker.setLatLng(newLatLng);
-    marker.setLatLng(newLatLng).update();
+    marker.setLatLng(newLatLng);
+    //marker.setLatLng(newLatLng).update();
 }
 
 function addAirplaneIconToMap(latitude, longitude) {
