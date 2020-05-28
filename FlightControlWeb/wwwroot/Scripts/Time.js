@@ -1,6 +1,4 @@
-﻿//let allMyFlightsUrl = "https://localhost:5001/api/Flights?relative_to=2020-05-25T10:30:00Z&sync_all";
-
-let allMyFlightsUrl;
+﻿let allMyFlightsUrl;
 
 function getTime() {
     let d = new Date();

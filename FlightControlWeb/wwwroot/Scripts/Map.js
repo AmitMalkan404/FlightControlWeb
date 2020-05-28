@@ -92,7 +92,7 @@ function removeMapLine(line) {
 }
 
 
-mymap.on('click', onMapClick);
+mymap.on('click', onMapClick);  
 
 //let latlng = [[32.01, 34.88], [19.02, 57.52], [13.77, 100.66]];
 
