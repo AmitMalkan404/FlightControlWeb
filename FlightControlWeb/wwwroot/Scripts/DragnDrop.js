@@ -37,25 +37,44 @@ function uploadFile(file) {
             method: 'POST',
             body: file,
         })
-        .then((response) => {
-            if (response.ok) {
-                console.log('file updated on server side');
-                return;
-            }
-            //console.log(response);
-            //throw new Error(response);
-            return response.json();
-        })
-        .then((jsonResponse) => {
-            console.log(jsonResponse.errors);
-            console.log(jsonResponse.errors.segments[0]);
+        .then(response => response.json())
+        .then(data => {
 
-            //throw new Error(response.fail);
+            for (const err in data.errors) {
+                if (data.errors.hasOwnProperty(err)) {
+                    console.log(data.errors[err].toString());
+                }
+            }
+            
         })
+        .catch(console.error);
+
+
+
+        //.then((response) => {
+        //    if (response.ok) {
+        //        console.log('file updated on server side');
+        //        return;
+        //    }
+        //    //console.log(response);
+        //    //throw new Error(response);
+
+        //    return response.json();
+
+            
+        //})
+        //.then((jsonResponse) => {
+            
+        //    //console.log(jsonResponse.errors);
+        //    console.log(jsonResponse);
+
+
+        //    //throw new Error(response.fail);
+        //})
         
-        .catch((error) => {
-            console.log(`Request failed: ${error.message}`);
-        });
+        //.catch((error) => {
+        //    console.log(`Request failed: ${error.message}`);
+        //});
 
     // .then((response) => {
     //    if (response.status === 200) { // Or what ever you want to check
