@@ -42,10 +42,17 @@ function uploadFile(file) {
                 console.log('file updated on server side');
                 return;
             }
-            console.log(response.fail);
-
-            throw new Error(response.fail);
+            //console.log(response);
+            //throw new Error(response);
+            return response.json();
         })
+        .then((jsonResponse) => {
+            console.log(jsonResponse.errors);
+            console.log(jsonResponse.errors.segments[0]);
+
+            //throw new Error(response.fail);
+        })
+        
         .catch((error) => {
             console.log(`Request failed: ${error.message}`);
         });

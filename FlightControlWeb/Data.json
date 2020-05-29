@@ -7,8 +7,8 @@
     "date_time": "2020-05-29T12:55:00Z"
   },
   "segments": [
-    {
-      "longitude": 20.0,
+	{
+      "longitude": 200,
       "latitude": 30.2,
       "timespan_seconds": 60
     },
