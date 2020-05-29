@@ -23,7 +23,10 @@ namespace FlightControlWeb
         {
             services.AddMemoryCache();
             services.AddDbContext<FlightContext>(opt => opt.UseInMemoryDatabase("FlightPlanList"));
-            services.AddControllers();
+            //services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
+            //services.AddControllersWithViews().AddNewtonsoftJson();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

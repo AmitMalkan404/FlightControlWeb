@@ -30,21 +30,23 @@ namespace FlightControlWeb.Controllers
         {
             string request = Request.QueryString.Value;
             bool isExternal = request.Contains("sync_all");
-            string timePattern = "yyyy-MM-ddTHH:mm:ssZ";
+            //string timePattern = "yyyy-MM-ddTHH:mm:ssZ";
             DateTime myTime = DateTime.Parse(relative_to);
             myTime = TimeZoneInfo.ConvertTimeToUtc(myTime);
             //myTime = myTime.AddHours(-2);
             //DateTime relativeTo = DateTime.ParseExact(relative_to, timePattern, System.Globalization.CultureInfo.InvariantCulture);
             // Get all non extrernal flights.
-            List<FlightPlan> allNotExternalFlights = await _context.FlightItems.ToListAsync();
+            List<FlightPlan> allNotExternalFlights = await _context.FlightItems.Include(x => x.SegmentsList).Include(x => x.InitialLocation).ToListAsync();
             // Get Servers flights.
             List<Server> allServers = await _context.Server.ToListAsync();
             List<Flight> resultAllFlights = new List<Flight>();
             // This is for all the non external flight.
-            foreach (var flightPlan in allNotExternalFlights)
+            foreach (FlightPlan flightPlan in allNotExternalFlights)
             {
+                List<Segment> segmentList = flightPlan.SegmentsList;
                 string flightId = flightPlan.FlightId;
-                Segment resultSegment = GetMyLocation(_context.Segment, flightPlan.Longitude, flightPlan.Latitude, flightPlan.DateTime, flightPlan.FlightId, myTime);
+                Segment resultSegment = GetMyLocation(flightPlan.InitialLocation.Longitude, flightPlan.InitialLocation.Longitude, flightPlan.InitialLocation.DateTime, 
+                    flightPlan.FlightId, myTime, segmentList);
                 // The result can be null which means the flight isnt relevant any more.
                 if (resultSegment == null)
                 {
@@ -61,73 +63,6 @@ namespace FlightControlWeb.Controllers
             }
             return resultAllFlights;
         }
-
-
-        //// GET: api/Flights/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<Flight>> GetFlight(string id)
-        //{
-        //    FlightPlan flightPlan = await _context.FlightItems.Where(x => x.FlightId == id).FirstAsync();
-        //    Segment resultSegment;
-        //    DateTime relativeTo = new DateTime(2009, 8, 1, 0, 0, 0);
-        //    //var flightPlan = await _context.FlightItems.FindAsync(id);
-
-        //    if (flightPlan == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    // need to use the func and get a segment with the longitude and the latitude.
-        //    resultSegment = GetMyLocation(_context.Segment, flightPlan.Longitude, flightPlan.Latitude, flightPlan.DateTime, flightPlan.FlightId, relativeTo);
-        //    Flight myflight = CreateFlight(flightPlan.CompanyName, flightPlan.FlightId, flightPlan.Passengers, flightPlan.IsExternal, resultSegment, relativeTo);
-        //    //myflight.Longitude = resultSegment.Latitude;
-        //    //myflight.Latitude = resultSegment.Latitude;
-        //    return myflight;
-        //}
-
-        //// PUT: api/Flights/5
-        //// To protect from overposting attacks, enable the specific properties you want to bind to, for
-        //// more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutFlight(long id, Flight flight)
-        //{
-        //    if (id != flight.Id)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    _context.Entry(flight).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!FlightExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
-
-        //// POST: api/Flights
-        //// To protect from overposting attacks, enable the specific properties you want to bind to, for
-        //// more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        //[HttpPost]
-        //public async Task<ActionResult<Flight>> PostFlight(Flight flight)
-        //{
-        //    _context.Flight.Add(flight);
-        //    await _context.SaveChangesAsync();
-
-        //    return CreatedAtAction("GetFlight", new { id = flight.Id }, flight);
-        //}
-
         // DELETE: api/Flights/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<FlightPlan>> DeleteFlightPlan(string id)
@@ -195,28 +130,33 @@ namespace FlightControlWeb.Controllers
                 HttpClient client = new HttpClient();
                 var response = await client.GetStringAsync(url);
                 string stringJsonFlight = response.ToString();
-                dynamic dJson = JsonConvert.DeserializeObject(stringJsonFlight);
-                foreach (var flight in dJson)
+                List<Flight> flightPlanList = JsonConvert.DeserializeObject<List<Flight>>(stringJsonFlight);
+                foreach(Flight flight in flightPlanList)
                 {
-                    if (!CheckValidFlightDetails(flight))
-                    {
-                        continue;
-                    }
-                    JToken json = flight;
-                    Segment segmentFlight = new Segment
-                    {
-                        Latitude = flight["latitude"],
-                        Longitude = flight["longitude"],
-                    };
-                    int passengers = flight["passengers"];
-                    string companyName = flight["company_name"];
-                    string flightId = flight["flight_id"];
-                    DateTime dateTimeFlight = flight["date_time"];
-                    bool isExternalFlight = true;
-                    Flight flightcreateFlight = CreateFlight(companyName, flightId, passengers, isExternalFlight, segmentFlight, dateTimeFlight);
-                    allExternalFlights.Add(flightcreateFlight);
+                    flight.IsExternal = true;
                 }
-                return allExternalFlights;
+                //dynamic dJson = JsonConvert.DeserializeObject(stringJsonFlight);
+                //foreach (var flight in dJson)
+                //{
+                //    if (!CheckValidFlightDetails(flight))
+                //    {
+                //        continue;
+                //    }
+                //    JToken json = flight;
+                //    Segment segmentFlight = new Segment
+                //    {
+                //        Latitude = flight["latitude"],
+                //        Longitude = flight["longitude"],
+                //    };
+                //    int passengers = flight["passengers"];
+                //    string companyName = flight["company_name"];
+                //    string flightId = flight["flight_id"];
+                //    DateTime dateTimeFlight = flight["date_time"];
+                //    bool isExternalFlight = true;
+                //    Flight flightcreateFlight = CreateFlight(companyName, flightId, passengers, isExternalFlight, segmentFlight, dateTimeFlight);
+                //    allExternalFlights.Add(flightcreateFlight);
+                //}
+                return flightPlanList;
             }
             catch
             {
@@ -225,7 +165,7 @@ namespace FlightControlWeb.Controllers
 
         }
 
-        public Segment GetMyLocation(DbSet<Segment> contextSegment, double longitude, double latitude, DateTime initialDateTime, string flightId, DateTime relativeTo)
+        public Segment GetMyLocation(double longitude, double latitude, DateTime initialDateTime, string flightId, DateTime relativeTo, List<Segment> segmentList)
         {
             Segment resultSegment = new Segment();
             bool isFuture = true;
@@ -235,7 +175,7 @@ namespace FlightControlWeb.Controllers
             DateTime thisFlightTime = initialDateTime;
             TimeSpan secondsPassedSpanTillNow = relativeTo - thisFlightTime;
             double secondsPassedTillNow = secondsPassedSpanTillNow.TotalSeconds;
-            var segmentList = from segment in contextSegment where segment.FlightId == id select segment;
+            //List<Segment> segmentList = from segment in contextSegment where segment.FlightId == id select segment;
             // compare relative time and start time.
             int isOver = DateTime.Compare(relativeTo, thisFlightTime);
             // Check if the now date is before even the flight time started.
