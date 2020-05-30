@@ -28,23 +28,23 @@ const track = new Array(2).fill(null);
 const details = new Array(2).fill(null);
 details[0] = document.getElementById('flightDetails');
 
+// function isInFlightsArray(flight) {
+//    for (i = 0; i < flightsArray.length; i += 1) {
+//        if (flight.flight_id === flightsArray[i].id) {
+//            return true;
+//        }
+//    }
+//    return false;
+// }
+
 function isInFlightsArray(flight) {
-    for (i = 0; i < flightsArray.length; i += 1) {
-        if (flight.flight_id === flightsArray[i].id) {
+    for (const myFlight of flightsArray) {
+        if (flight.flight_id === myFlight.id) {
             return true;
         }
     }
     return false;
 }
-
-//function isInFlightsArray(flight) {
-//    for (const myFlight of flightsArray) {
-//        if (flight.flight_id === myFlight.id) {
-//            return true;
-//        }
-//    }
-//    return false;
-//}
 
 function generateTrack(flightId) {
     if (track[0] !== null) {
@@ -254,10 +254,8 @@ function linkRowDetailsTrack(marker, action) {
 }
 /* eslint-enable no-unused-vars */
 
-
-let i = 0;
-
 function getFlights() {
+    let i = 0;
     $.getJSON(allMyFlightsUrl, (data) => {
         data.forEach((jsonFlight) => {
             if (!isInFlightsArray(jsonFlight)) {
