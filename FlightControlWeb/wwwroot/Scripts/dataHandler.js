@@ -53,15 +53,34 @@ function generateTrack(flightId) {
     let i;
     const latlngs = [];
     myFlightPlanUrl = `api/FlightPlans/${flightId}`;
+    //myFlightPlanUrl = 'api/FlightPlans/85678h';
 
-    $.getJSON(myFlightPlanUrl, (data) => {
-        for (i = 0; i < data.segments.length; i += 1) {
-            latlngs[i] = [data.segments[i].latitude, data.segments[i].longitude];
+    $.ajax({
+        url: myFlightPlanUrl,
+        dataType: 'json',
+        success: function(data) {
+            for (i = 0; i < data.segments.length; i += 1) {
+                latlngs[i] = [data.segments[i].latitude, data.segments[i].longitude];
+            }
+            track[0] = mapLine(latlngs);
+            track[1] = flightId;
+        },
+        error: function(data) {
+            $.notify('Error:  Flight ID not found', 'error');
         }
-        track[0] = mapLine(latlngs);
-        track[1] = flightId;
     });
 }
+
+//    $.getJSON(myFlightPlanUrl,
+//        (data) => {
+//            for (i = 0; i < data.segments.length; i += 1) {
+//                latlngs[i] = [data.segments[i].latitude, data.segments[i].longitude];
+//            }
+//            track[0] = mapLine(latlngs);
+//            track[1] = flightId;
+//        });
+//    $.notify('Error:  Flight ID not found', 'error');
+//}
 
 function removeTrack() {
     if (track[0] !== null) {
@@ -97,6 +116,7 @@ function removeFlightDetails() {
 
 function deleteFlight(deleteButton, flightToDelete) {
     const deleteFlightUrl = `api/Flights/${flightToDelete.id}`;
+    // const deleteFlightUrl = 'api/Flights/fgch5';
     // let rowIndex = deleteButton.parentNode.parentNode.rowIndex;
     const { rowIndex } = deleteButton.parentNode;
 
@@ -104,7 +124,10 @@ function deleteFlight(deleteButton, flightToDelete) {
             {
                 method: 'DELETE',
             })
-        .then(() => { /* Done. Inform the user */
+        .then((response) => { /* Done. Inform the user */
+            if (!response.ok) {
+                throw Error('err');
+            }
             // delete row from flights table
             document.getElementById('myflightstable').deleteRow(rowIndex);
             removeMarkerFromMap(flightToDelete.planeMarker);
@@ -123,8 +146,8 @@ function deleteFlight(deleteButton, flightToDelete) {
             flightsArray.splice(flightIndex, 1);
             console.log('flight deleted successfully');
         })
-        .catch(() => { /* Error. Inform the user */
-            console.log('Error Deleting flight');
+        .catch((err) => { /* Error. Inform the user */
+            console.log($.notify('Error: The flight was not deleted from server'));
         });
 }
 
@@ -256,7 +279,42 @@ function linkRowDetailsTrack(marker, action) {
 
 function getFlights() {
     let i = 0;
-    $.getJSON(allMyFlightsUrl, (data) => {
+    //$.ajax({
+    //    url: allMyFlightsUrl,
+    //    dataType: 'json',
+    //    success: function (data) {
+    //        data.forEach((jsonFlight) => {
+    //            if (!isInFlightsArray(jsonFlight)) {
+    //                flightsArray[i] = new Flight(jsonFlight.flight_id, jsonFlight.latitude,
+    //                    jsonFlight.longitude, jsonFlight.company_name, jsonFlight.passengers);
+
+    //                if (jsonFlight.is_external === false) {
+    //                    flightsArray[i].isExternal = false;
+    //                    addRowToTable('myflightstable', flightsArray[i], jsonFlight);
+    //                } else {
+    //                    flightsArray[i].isExternal = true;
+    //                    addRowToTable('externalFlightstable', flightsArray[i], jsonFlight);
+    //                }
+    //            }
+
+    //            if (!flightsArray[i].iconExists) {
+    //                flightsArray[i].setPlaneMarker(addAirplaneIconToMap(jsonFlight.latitude,
+    //                    jsonFlight.longitude));
+    //                flightsArray[i].iconExists = true;
+    //            }
+    //            moveMarker(flightsArray[i].getPlaneMarker(), jsonFlight.latitude, jsonFlight.longitude);
+    //            updateFlightDetails();
+    //            i += 1;
+    //        });
+    //        updateExistingFlights(data);
+    //    },
+    //    error: function (data) {
+    //        $.notify('Error:  no response from server', 'error');
+    //    }
+    //});
+
+
+     $.getJSON(allMyFlightsUrl, (data) => {
         data.forEach((jsonFlight) => {
             if (!isInFlightsArray(jsonFlight)) {
                 flightsArray[i] = new Flight(jsonFlight.flight_id, jsonFlight.latitude,
@@ -276,13 +334,12 @@ function getFlights() {
                     jsonFlight.longitude));
                 flightsArray[i].iconExists = true;
             }
-            console.log(jsonFlight.latitude, jsonFlight.longitude);
             moveMarker(flightsArray[i].getPlaneMarker(), jsonFlight.latitude, jsonFlight.longitude);
             updateFlightDetails();
             i += 1;
         });
         updateExistingFlights(data);
-    });
+     });
 }
 
 setInterval(getFlights, 500);

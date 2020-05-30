@@ -82,7 +82,6 @@ function mapLine(latlngs) {
 }
 
 function removeMapLine(line) {
-    console.log(line);
     mymap.removeLayer(line);
 }
 /* eslint-enable no-unused-vars */

@@ -26,84 +26,27 @@ function unhighlight(e) {
     dropArea.addEventListener(eventName, unhighlight, false);
 });
 
+/* eslint-disable no-prototype-builtins */
 function uploadFile(file) {
     const url = 'https://localhost:5001/api/FlightPlans';
-    // let formData = new FormData()
-
-    // formData.append('file', file)
 
     fetch(url,
         {
             method: 'POST',
-            body: file,
+            body: file
         })
-        .then(response => response.json())
-        .then(data => {
-
+        .then((response) => response.json())
+        .then((data) => {
             for (const err in data.errors) {
                 if (data.errors.hasOwnProperty(err)) {
-                    console.log(data.errors[err].toString());
+                    // console.log(data.errors[err].toString());
+                    PostErrorNotification(data.errors[err].toString());
                 }
             }
-            
         })
-        .catch(console.error);
-
-
-
-        //.then((response) => {
-        //    if (response.ok) {
-        //        console.log('file updated on server side');
-        //        return;
-        //    }
-        //    //console.log(response);
-        //    //throw new Error(response);
-
-        //    return response.json();
-
-            
-        //})
-        //.then((jsonResponse) => {
-            
-        //    //console.log(jsonResponse.errors);
-        //    console.log(jsonResponse);
-
-
-        //    //throw new Error(response.fail);
-        //})
-        
-        //.catch((error) => {
-        //    console.log(`Request failed: ${error.message}`);
-        //});
-
-    // .then((response) => {
-    //    if (response.status === 200) { // Or what ever you want to check
-    //        return Promise.resolve(response.json()); // This will end up in SUCCESS part
-    //    }
-    //    console.log(response);
-    //    console.log(response.json());
-
-    //    return Promise.resolve(response.json()).then((responseInJson) => {
-    //            return Promise.reject(responseInJson.message);
-    //        });
-    // })
-    // .then((result) => { // SUCCESS part
-    //        console.log(`Success: ${result}`); // Response from api in json
-    //    },
-    //    (error) => { // ERROR part
-    //        // Because we rejected responseInJson.message,
-    //        // error will contain message from api.In this case "Some nasty error message!"
-    //        console.log(`Error: ${error}`);
-    //    })
-    // .catch((catchError) => {
-    //    console.log(`Catch: ${catchError}`);
-    // });
-
-
-    // .catch(() => { /* Error. Inform the user */
-    //    console.log();
-    // });
+        .catch((err) => {console.log(err);});
 }
+/* eslint-enable no-prototype-builtins */
 
 function handleFiles(files) {
     ([...files]).forEach(uploadFile);
