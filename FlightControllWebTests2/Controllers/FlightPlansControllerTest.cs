@@ -8,8 +8,9 @@ using FlightControlWeb.Models;
 using FlightControlWeb;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using System.Linq;
 
-namespace FlightControllWeb.Tests
+namespace FlightControllWeb.Controllers
 {
     [TestClass()]
     public class FlightsControllerTests
@@ -27,11 +28,11 @@ namespace FlightControllWeb.Tests
         }
 
         [TestMethod()]
-        public async Task<ActionResult<FlightPlan>> GetFlightPlanTest()
+        public async Task GetFlightPlanTest()
         {
-            FlightsControllerTests controllerTests = new FlightsControllerTests();
+            //FlightsControllerTests controllerTests = new FlightsControllerTests();
 
-
+            // Assign
             InitialLocation location = new InitialLocation();
             DateTime dateTime = new DateTime(2020, 5, 31, 18, 0, 0);
             location.DateTime = dateTime;
@@ -55,7 +56,8 @@ namespace FlightControllWeb.Tests
 
             //FlightPlan flightPlan1 = new FlightPlan("LY1255", 168, "EL-AL", location, segList, false);
             FlightPlan flightPlan1 = new FlightPlan();
-            flightPlan1.FlightId = "LY1255";
+            flightPlan1.Id = 1255;
+            flightPlan1.FlightId = "EL01";
             flightPlan1.Passengers = 168;
             flightPlan1.CompanyName = "EL-AL";
             flightPlan1.InitialLocation = location;
@@ -63,10 +65,22 @@ namespace FlightControllWeb.Tests
             flightPlan1.IsExternal = false;
 
 
-            controllerTests._FlightDBContextMock.Add(flightplan1);
-            controllerTests.fpc.PostFlightPlan(flightPlan1);
+            //_FlightDBContextMock.Add(flightPlan1);
+            //controllerTests.fpc.PostFlightPlan(flightPlan1);
+            Task<ActionResult<FlightPlan>> apiFlight = fpc.PostFlightPlan(flightPlan1);
+            //var hey = apiFlight;
 
+            //var contextFlight = await _FlightDBContextMock.FlightItems.FindAsync(1255);
+            var contextFlights = await _FlightDBContextMock.FlightItems.ToListAsync();
+            var contextFlight = contextFlights.Where(a => a.FlightId.CompareTo("EL01") == 0).First();
+            //var singleContextFlight = contextFlight[0];
+            // Act
+            //Task<ActionResult<FlightPlan>> apiFlight = fpc.GetFlightPlan("LY1255");
 
+            //Assert
+            Assert.IsNotNull(contextFlight);
+            Assert.IsTrue(contextFlight.FlightId.CompareTo("EL01")==0);
+            Assert.IsTrue(contextFlight.Passengers == 168);
             //FlightPlan flightPlan = await _context.FlightItems.Include(x => x.SegmentsList).Include(x => x.InitialLocation).Where(x => x.FlightId == id).FirstOrDefaultAsync();
             //Assert.Fail();
         }
