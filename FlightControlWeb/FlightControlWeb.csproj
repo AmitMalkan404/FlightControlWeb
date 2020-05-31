@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
     <None Include="wwwroot\Scripts\DragnDrop.js" />
     <None Include="wwwroot\Scripts\Map.js" />
     <None Include="wwwroot\Index.html" />
