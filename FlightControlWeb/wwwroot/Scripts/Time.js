@@ -9,7 +9,9 @@ function getTime() {
     let time = new Date(utcString);
     time = time.toISOString().slice(0, -2);
     // console.log(time);
-    allMyFlightsUrl = `https://localhost:5001/api/Flights?relative_to=${time}Z&sync_all`;
+    //allMyFlightsUrl = `http://localhost:5001/api/Flights?relative_to=${time}Z&sync_all`;
+    allMyFlightsUrl = `/api/Flights?relative_to=${time}Z&sync_all`;
+
 }
 
 setInterval(getTime, 500);

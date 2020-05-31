@@ -27,7 +27,9 @@ function unhighlight(e) {
 });
 
 function uploadFile(file) {
-    const url = 'https://localhost:5001/api/FlightPlans';
+    //const url = 'http://localhost:5001/api/FlightPlan';
+    const url = '/api/FlightPlan';
+
     // let formData = new FormData()
 
     // formData.append('file', file)

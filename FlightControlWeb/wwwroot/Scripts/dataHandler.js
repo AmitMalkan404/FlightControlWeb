@@ -52,7 +52,7 @@ function generateTrack(flightId) {
     }
     let i;
     const latlngs = [];
-    myFlightPlanUrl = `api/FlightPlans/${flightId}`;
+    myFlightPlanUrl = `api/FlightPlan/${flightId}`;
 
     $.getJSON(myFlightPlanUrl, (data) => {
         for (i = 0; i < data.segments.length; i += 1) {

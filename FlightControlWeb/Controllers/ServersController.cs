@@ -37,9 +37,6 @@ namespace FlightControlWeb.Controllers
         [HttpPost]
         public async Task<ActionResult<Server>> PostServer([FromBody] Server serverJson)
         {
-            //string stringJsonFlight = jsonFlight.ToString();
-            //dynamic jsonObj = JsonConvert.DeserializeObject(stringJsonFlight);
-            //bool validServer = CheckValidServer(server);
             _context.Server.Add(serverJson);
             try
             {
@@ -72,14 +69,6 @@ namespace FlightControlWeb.Controllers
         private bool ServerExists(string id)
         {
             return _context.Server.Any(e => e.ServerId == id);
-        }
-        public bool CheckValidServer(Server server)
-        {
-            if ((server.ServerURL == "") || server.ServerId == "")
-            {
-                throw new ArgumentException("One of the server details is not in a correct format. Please try again.");
-            }
-            return true;
         }
     }
 }

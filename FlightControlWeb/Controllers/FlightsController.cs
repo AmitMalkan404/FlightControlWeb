@@ -30,11 +30,8 @@ namespace FlightControlWeb.Controllers
         {
             string request = Request.QueryString.Value;
             bool isExternal = request.Contains("sync_all");
-            //string timePattern = "yyyy-MM-ddTHH:mm:ssZ";
             DateTime myTime = DateTime.Parse(relative_to);
             myTime = TimeZoneInfo.ConvertTimeToUtc(myTime);
-            //myTime = myTime.AddHours(-2);
-            //DateTime relativeTo = DateTime.ParseExact(relative_to, timePattern, System.Globalization.CultureInfo.InvariantCulture);
             // Get all non extrernal flights.
             List<FlightPlan> allNotExternalFlights = await _context.FlightItems.Include(x => x.SegmentsList).Include(x => x.InitialLocation).ToListAsync();
             // Get Servers flights.
@@ -118,13 +115,9 @@ namespace FlightControlWeb.Controllers
             try
             {
                 List<Flight> allExternalFlights = new List<Flight>();
-                //string url = "https://";
                 string url = "";
                 url += myServer.ServerURL;
                 url += "/api/Flights?relative_to=";
-                //url += "Flights?relative_to=";
-                //dateTime = dateTime.AddHours(2);
-                //dateTime.ToString("yyyy-MM-dd HH':'mm':'ss");
                 string date = dateTime.ToString();
                 url += date;
                 HttpClient client = new HttpClient();
@@ -135,27 +128,6 @@ namespace FlightControlWeb.Controllers
                 {
                     flight.IsExternal = true;
                 }
-                //dynamic dJson = JsonConvert.DeserializeObject(stringJsonFlight);
-                //foreach (var flight in dJson)
-                //{
-                //    if (!CheckValidFlightDetails(flight))
-                //    {
-                //        continue;
-                //    }
-                //    JToken json = flight;
-                //    Segment segmentFlight = new Segment
-                //    {
-                //        Latitude = flight["latitude"],
-                //        Longitude = flight["longitude"],
-                //    };
-                //    int passengers = flight["passengers"];
-                //    string companyName = flight["company_name"];
-                //    string flightId = flight["flight_id"];
-                //    DateTime dateTimeFlight = flight["date_time"];
-                //    bool isExternalFlight = true;
-                //    Flight flightcreateFlight = CreateFlight(companyName, flightId, passengers, isExternalFlight, segmentFlight, dateTimeFlight);
-                //    allExternalFlights.Add(flightcreateFlight);
-                //}
                 return flightPlanList;
             }
             catch
@@ -175,7 +147,6 @@ namespace FlightControlWeb.Controllers
             DateTime thisFlightTime = initialDateTime;
             TimeSpan secondsPassedSpanTillNow = relativeTo - thisFlightTime;
             double secondsPassedTillNow = secondsPassedSpanTillNow.TotalSeconds;
-            //List<Segment> segmentList = from segment in contextSegment where segment.FlightId == id select segment;
             // compare relative time and start time.
             int isOver = DateTime.Compare(relativeTo, thisFlightTime);
             // Check if the now date is before even the flight time started.
@@ -218,16 +189,6 @@ namespace FlightControlWeb.Controllers
             double distLongitude = currSegment.Longitude - prevSegment.Longitude;
             double latitudeResult = prevSegment.Latitude + (proportionalTime * distLatitude);
             double longitudeResult = prevSegment.Longitude + (proportionalTime * distLongitude);
-
-
-            //double distX = currSegment.Latitude -prevSegment.Latitude;
-            //double distY = currSegment.Longitude - prevSegment.Longitude;
-            //double distance = Math.Sqrt(Math.Pow(distX, 2) + Math.Pow(distY, 2));
-            //double proportionalDistance = proportionalTime * distance;
-            //double latitudeResult = prevSegment.Latitude + (prevSegment.Latitude * proportionalTime);
-            //double longitudeResult = prevSegment.Longitude + (prevSegment.Longitude * proportionalTime);
-            //double latitudeResult = prevSegment.Latitude - ((proportionalDistance * (prevSegment.Latitude - currSegment.Longitude)) / distance);
-            //double longitudeResult = prevSegment.Longitude - ((proportionalDistance * (prevSegment.Longitude - currSegment.Longitude)) / distance);
             Segment myLocation = new Segment
             {
                 Latitude = latitudeResult,
@@ -251,25 +212,6 @@ namespace FlightControlWeb.Controllers
                 _context.FlightByServerIds.Add(flightToDb);
                 await _context.SaveChangesAsync();
             }
-        }
-        bool CheckValidFlightDetails(dynamic flight)
-        {
-            double latitude = flight["latitude"];
-            double longitude = flight["longitude"];
-            string companyName = flight["company_name"];
-            if(companyName == "")
-            {
-                return false;
-            }
-            if(longitude < -90 || longitude > 90)
-            {
-                return false;
-            }
-            if (latitude < -180 || latitude > 180)
-            {
-                return false;
-            }
-            return true;
         }
     }
 }
