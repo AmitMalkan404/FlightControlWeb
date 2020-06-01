@@ -104,6 +104,10 @@ namespace FlightControlWeb.Controllers
             for (int i = 0; i < allServers.Count; i++)
             {
                 List<Flight> tempFlights = await GetExternalFlightsFromServer(allServers[i], dateTime);
+                if(tempFlights == null)
+                {
+                    continue;
+                }
                 AddAllExternalFlightToDb(tempFlights, allServers[i].ServerURL);
                 allExternalFlights.AddRange(tempFlights);
             }
