@@ -6,6 +6,7 @@ const track = new Array(2).fill(null);
 const details = new Array(2).fill(null);
 details[0] = document.getElementById('flightDetails');
 
+/* eslint-disable no-undef */
 function generateTrack(flightId) {
     if (track[0] !== null) {
         return;
@@ -25,7 +26,7 @@ function generateTrack(flightId) {
             track[0] = mapLine(latlngs);
             track[1] = flightId;
         },
-        error: function(data) {
+        error: function() {
             $.notify('Error:  Flight ID not found', 'error');
         }
     });
@@ -95,7 +96,7 @@ function deleteFlight(deleteButton, flightToDelete) {
             flightsArray.splice(flightIndex, 1);
             console.log('flight deleted successfully');
         })
-        .catch((err) => { /* Error. Inform the user */
+        .catch(() => { /* Error. Inform the user */
             console.log($.notify('Error: The flight was not deleted from server'));
         });
 }
@@ -226,7 +227,6 @@ function linkRowDetailsTrack(marker, action) {
 
 }
 /* eslint-enable no-unused-vars */
-
 function getFlights() {
     $.ajax({
         url: allMyFlightsUrl,
@@ -258,11 +258,12 @@ function getFlights() {
             }
             updateExistingFlights(data);
         },
-        error: function (data) {
+        error: function () {
             $.notify('Server is not responding', 'error');
         }
     });
 
 }
+/* eslint-enable no-undef */
 
 setInterval(getFlights, 600);
