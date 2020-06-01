@@ -12,8 +12,8 @@ function generateTrack(flightId) {
     }
     let i;
     const latlngs = [];
-    myFlightPlanUrl = `api/FlightPlans/${flightId}`;
-    //myFlightPlanUrl = 'api/FlightPlans/85678h';
+    myFlightPlanUrl = `api/FlightPlan/${flightId}`;
+    //myFlightPlanUrl = 'api/FlightPlan/85678h';
 
     $.ajax({
         url: myFlightPlanUrl,

@@ -28,7 +28,9 @@ function unhighlight(e) {
 
 /* eslint-disable no-prototype-builtins */
 function uploadFile(file) {
-    const url = 'https://localhost:5001/api/FlightPlans';
+    //const url = 'https://localhost:5001/api/FlightPlans';
+    const url = '/api/FlightPlans';
+
     try {
         (async () => {
             const rawResponse = await fetch(url, {
