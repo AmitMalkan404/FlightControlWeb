@@ -36,7 +36,8 @@ function PostErrorNotification(data) {
     // }
 
     if (data === 'Latitude has to be between -90.000001 to 90'
-        || data === 'Longitude has to be between -180.000001 to 180') {
+        || data === 'Longitude has to be between -180.000001 to 180'
+        || data == 'TimeSpan must be possitive') {
         $.notify(data, 'error');
     } else if (lastError === null) {
         $.notify('There has been a problem with your Json file', 'error');

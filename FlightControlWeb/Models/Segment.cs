@@ -20,6 +20,8 @@ namespace FlightControlWeb.Models
 		[Range(-90.000001, 90, ErrorMessage = "{0} has to be between {1} to {2}")]
 		public double Latitude { get; set; }
 		[JsonProperty("timespan_seconds")]
+		[Range(0, Double.MaxValue, ErrorMessage = "TimeSpan must be possitive")]
+
 		public double TimespanSeconds { get; set; }
 		public string FlightId { get; set; }
 
