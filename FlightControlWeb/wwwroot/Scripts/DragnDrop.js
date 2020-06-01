@@ -46,7 +46,6 @@ function uploadFile(file) {
                     if (jsonContent.errors.hasOwnProperty(err)) {
                         // console.log(data.errors[err].toString());
                         PostErrorNotification(jsonContent.errors[err].toString());
-                        throw Error('e');
                     }
                 }
             }
