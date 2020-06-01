@@ -16,13 +16,13 @@ namespace FlightControlWeb.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class FlightPlansController : ControllerBase
+    public class FlightPlanController : ControllerBase
     {
         private readonly FlightContext _context;
         private static int _flightsNumber=0;
 
 
-        public FlightPlansController(FlightContext context)
+        public FlightPlanController(FlightContext context)
         {
             _context = context;
         }
@@ -54,9 +54,6 @@ namespace FlightControlWeb.Controllers
         [HttpPost]
         public async Task<ActionResult<FlightPlan>> PostFlightPlan([FromBody] FlightPlan jsonFlight)
         {
-            // string stringJsonFlight = jsonFlight.ToString();
-            //dynamic jsonObj = JsonConvert.DeserializeObject(stringJsonFlight);
-            //FlightPlan fp = JsonConvert.DeserializeObject<FlightPlan>(stringJsonFlight);
             jsonFlight.FlightId = SetFlightId(jsonFlight.CompanyName);
             _context.FlightItems.Add(jsonFlight);
             await _context.SaveChangesAsync();
@@ -85,18 +82,11 @@ namespace FlightControlWeb.Controllers
             {
                 return NotFound();
             }
-            //var flightByServerId = from flight in _context.FlightByServerIds where flight.FlightId == id select flight;
             var flightPlan = await GetExternalFlightFromServer(serverUrl.ServerId, id);
             return flightPlan;
-            //catch
-            //{
-            //    throw new ArgumentException("This is an external flightPlan. Something went wrong with its server.");
-            //}
-            //return null;
         }
         public async Task<ActionResult<FlightPlan>> GetExternalFlightFromServer(string myServerUrl,string id)
         {
-            //string url = "https://";
             string url = "";
             url += myServerUrl;
             url += "/api/FlightPlans/" + id;
@@ -108,7 +98,6 @@ namespace FlightControlWeb.Controllers
             }
             string stringJsonFlight = response.ToString();
             FlightPlan fp = JsonConvert.DeserializeObject<FlightPlan>(stringJsonFlight);
-            //dynamic json = JsonConvert.DeserializeObject(stringJsonFlight);
             return fp;
         }
     }
