@@ -28,8 +28,8 @@ function unhighlight(e) {
 
 /* eslint-disable no-prototype-builtins */
 function uploadFile(file) {
-    //const url = 'https://localhost:5001/api/FlightPlans';
-    const url = '/api/FlightPlans';
+    //const url = 'https://localhost:5001/api/FlightPlan';
+    const url = '/api/FlightPlan';
 
     try {
         (async () => {

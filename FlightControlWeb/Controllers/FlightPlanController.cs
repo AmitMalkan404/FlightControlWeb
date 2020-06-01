@@ -27,7 +27,7 @@ namespace FlightControlWeb.Controllers
             _context = context;
         }
 
-        //GET: api/FlightPlans/5
+        //GET: api/FlightPlan/5
         [HttpGet("{id}")]
         public async Task<ActionResult<FlightPlan>> GetFlightPlan(string id)
         {
@@ -48,7 +48,7 @@ namespace FlightControlWeb.Controllers
                 return NotFound();
             }
         }
-        // POST: api/FlightPlans
+        // POST: api/FlightPlan
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
@@ -89,7 +89,7 @@ namespace FlightControlWeb.Controllers
         {
             string url = "";
             url += myServerUrl;
-            url += "/api/FlightPlans/" + id;
+            url += "/api/FlightPlan/" + id;
             HttpClient client = new HttpClient();
             var response = await client.GetStringAsync(url);
             if (response == null)
