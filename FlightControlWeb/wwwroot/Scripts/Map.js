@@ -29,7 +29,7 @@ let clickedMarker = null;
 // L.marker([29.72, 35.00], { icon: airplaneIcon }).addTo(mymap);
 // moveMarker(markerr, 15.51, 28.00);
 
-
+/* eslint-disable no-undef */
 function releaseClick() {
     if (isMarkerClicked) {
         clickedMarker.setIcon(unselectedIcon);
@@ -51,6 +51,7 @@ function onMarkerClick(marker) {
     clickedMarker = marker;
     linkRowDetailsTrack(marker, 'link');
 }
+
 /* eslint-disable no-unused-vars */
 function moveMarker(marker, lat, lon) {
     const newLatLng = new L.LatLng(lat, lon);
@@ -87,6 +88,7 @@ function removeMapLine(line) {
 /* eslint-enable no-unused-vars */
 
 mymap.on('click', onMapClick);
+/* eslint-enable no-undef */
 
 // let latlng = [[32.01, 34.88], [19.02, 57.52], [13.77, 100.66]];
 // let poly = new L.polyline(latlng, { color: 'red' });
