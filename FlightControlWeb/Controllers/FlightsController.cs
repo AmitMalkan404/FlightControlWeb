@@ -169,7 +169,6 @@ namespace FlightControlWeb.Controllers
             {
                 return null;
             }
-            int i = 0;
             Segment currSegment = new Segment();
             // Find the segment we need.
             Segment prevSegment = new Segment()

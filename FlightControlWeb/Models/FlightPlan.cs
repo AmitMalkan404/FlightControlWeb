@@ -17,6 +17,7 @@ namespace FlightControlWeb.Models
 		[JsonProperty("flight_id")]
 		public string FlightId { get; set; }
 		[JsonProperty("passengers")]
+		[Range(0, Double.MaxValue, ErrorMessage = "Amount of passengers must be possitive")]
 		public int Passengers { get; set; }
 		[JsonProperty("company_name")]
 		

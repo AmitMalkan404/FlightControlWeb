@@ -4,6 +4,21 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <WarningLevel>3</WarningLevel>
+    <OutputPath>../out</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>3</WarningLevel>
+    <OutputPath>../out</OutputPath>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+
   <ItemGroup>
     <Compile Remove="wwwroot\js\**" />
     <Compile Remove="wwwroot\styles\**" />
@@ -35,6 +50,10 @@
     <None Include="wwwroot\StyleSheet.css" />
     <None Include="wwwroot\Pictures\wallpaper2.jpg" />
   </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="mkdir $(SolutionDir)\wwwroot&#xD;&#xA;mkdir $(SolutionDir)\out\wwwroot&#xD;&#xA;xcopy /E /Y &quot;$(ProjectDir)wwwroot&quot; &quot;$(SolutionDir)wwwroot&quot;&#xD;&#xA;xcopy /E /Y &quot;$(ProjectDir)wwwroot&quot; &quot;$(SolutionDir)out/wwwroot&quot;" />
+  </Target>
 
 
 </Project>
