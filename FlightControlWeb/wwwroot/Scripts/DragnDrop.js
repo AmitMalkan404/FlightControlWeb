@@ -27,8 +27,19 @@ function unhighlight() {
     dropArea.addEventListener(eventName, unhighlight, false);
 });
 
+// Handle errors returned from server.
 /* eslint-disable no-undef */
 /* eslint-disable no-prototype-builtins */
+function handleErrors(jsonContent) {
+    for (const err in jsonContent.errors) {
+        if (jsonContent.errors.hasOwnProperty(err)) {
+            PostErrorNotification(jsonContent.errors[err].toString());
+        }
+    }
+}
+/* eslint-enable no-prototype-builtins */
+/* eslint-enable no-undef */
+
 // Uploads file to server.
 function uploadFile(file) {
     //const url = 'https://localhost:5001/api/FlightPlan';
@@ -46,20 +57,13 @@ function uploadFile(file) {
             // Handle errors returned from server.
             else {
                 const jsonContent = await rawResponse.json();
-                for (const err in jsonContent.errors) {
-                    if (jsonContent.errors.hasOwnProperty(err)) {
-                        // console.log(data.errors[err].toString());
-                        PostErrorNotification(jsonContent.errors[err].toString());
-                    }
-                }
+                handleErrors(jsonContent);
             }
         })();
     } catch (err) {
         console.log('error: ' + err.message);
     }
 }
-/* eslint-enable no-prototype-builtins */
-/* eslint-enable no-undef */
 
 function handleFiles(files) {
     ([...files]).forEach(uploadFile);

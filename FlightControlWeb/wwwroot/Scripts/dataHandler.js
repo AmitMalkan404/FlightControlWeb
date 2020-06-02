@@ -176,6 +176,17 @@ function removeExpiredFlight(j) {
     flightsArray.splice(j, 1);
 }
 
+// Finds out if a flight in flightsArray is in data or not.
+function findFlightInData(data, j) {
+    for (const jsonFlight of data) {
+        if (flightsArray[j].id === jsonFlight.flight_id) {
+            // the flight is active
+            return true;
+        }
+    }
+    return false;
+}
+
 // Iterates over the flights that returns from server to see if a flight is expired.
 function updateExistingFlights(data) {
     let j;
@@ -184,14 +195,8 @@ function updateExistingFlights(data) {
         return;
     }
     for (j = 0; j < flightsArray.length; j += 1) {
-        active = false;
-        for (const jsonFlight of data) {
-            if (flightsArray[j].id === jsonFlight.flight_id) {
-                // the flight is active
-                active = true;
-                break;
-            }
-        }
+        active = findFlightInData(data, j);
+
         if (!active) {
             removeExpiredFlight(j);
         }
@@ -220,6 +225,38 @@ function linkRowDetailsTrack(marker, action) {
 
 }
 
+// Adds a new flight to flightsArray.
+function addNewFlightToArray(jsonFlight) {
+    const newFlight = new Flight(jsonFlight.flight_id, jsonFlight.latitude,
+        jsonFlight.longitude, jsonFlight.company_name, jsonFlight.passengers);
+    if (jsonFlight.is_external === false) {
+        newFlight.isExternal = false;
+        addRowToTable('myflightstable', newFlight, jsonFlight);
+    } else {
+        newFlight.isExternal = true;
+        addRowToTable('externalFlightstable', newFlight, jsonFlight);
+    }
+    flightsArray.push(newFlight);
+}
+
+// Changes flight.
+function flightLogic(data) {
+    for (const jsonFlight of data) {
+        // If it's a new flight.
+        if (!flightsArray.some(myFlight => myFlight.id === jsonFlight.flight_id)) {
+            addNewFlightToArray(jsonFlight);
+        }
+        const newFlightIndex = flightsArray.findIndex((myFlight) => myFlight.id === jsonFlight.flight_id);
+        if (!flightsArray[newFlightIndex].iconExists) {
+            flightsArray[newFlightIndex].setPlaneMarker(addAirplaneIconToMap(jsonFlight.latitude,
+                jsonFlight.longitude));
+            flightsArray[newFlightIndex].iconExists = true;
+        }
+        moveMarker(flightsArray[newFlightIndex].getPlaneMarker(), jsonFlight.latitude, jsonFlight.longitude);
+        updateFlightDetails();
+    }
+}
+
 // Gets flights from the server.
 /* eslint-enable no-unused-vars */
 function getFlights() {
@@ -227,29 +264,7 @@ function getFlights() {
         url: allMyFlightsUrl,
         dataType: 'json',
         success: function (data) {
-            for (const jsonFlight of data) {
-                // If it's a new flight.
-                if (!flightsArray.some(myFlight => myFlight.id === jsonFlight.flight_id)) {
-                    const newFlight = new Flight(jsonFlight.flight_id, jsonFlight.latitude,
-                        jsonFlight.longitude, jsonFlight.company_name, jsonFlight.passengers);
-                    if (jsonFlight.is_external === false) {
-                        newFlight.isExternal = false;
-                        addRowToTable('myflightstable', newFlight, jsonFlight);
-                    } else {
-                        newFlight.isExternal = true;
-                        addRowToTable('externalFlightstable', newFlight, jsonFlight);
-                    }
-                    flightsArray.push(newFlight);
-                }
-                const newFlightIndex = flightsArray.findIndex((myFlight) => myFlight.id === jsonFlight.flight_id);
-                if (!flightsArray[newFlightIndex].iconExists) {
-                    flightsArray[newFlightIndex].setPlaneMarker(addAirplaneIconToMap(jsonFlight.latitude,
-                        jsonFlight.longitude));
-                    flightsArray[newFlightIndex].iconExists = true;
-                }
-                moveMarker(flightsArray[newFlightIndex].getPlaneMarker(), jsonFlight.latitude, jsonFlight.longitude);
-                updateFlightDetails();
-            }
+            flightLogic(data);
             updateExistingFlights(data);
         },
         error: function () {
