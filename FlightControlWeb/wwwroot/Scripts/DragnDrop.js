@@ -42,7 +42,6 @@ function handleErrors(jsonContent) {
 
 // Uploads file to server.
 function uploadFile(file) {
-    //const url = 'https://localhost:5001/api/FlightPlan';
     const url = '/api/FlightPlan';
     try {
         (async () => {
