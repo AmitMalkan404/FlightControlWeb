@@ -68,9 +68,10 @@ namespace FlightControlWeb.Controllers
         }
         public string SetFlightId(string flightName)
         {
+            // Giving the new flight plan an ID using chars and numbers.
             string flightId = flightName.Substring(0, 3);
             int flightIdlen = flightId.Length;
-            for (int i = flightIdlen; i < 10; i++)
+            for (int i = flightIdlen + 1; i < 10; i++)
             {
                 flightId += _flightsNumber;
                 _flightsNumber++;
