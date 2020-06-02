@@ -1,8 +1,9 @@
-﻿
+﻿// A global url for get flights api
 /* eslint-disable no-unused-vars */
 let allMyFlightsUrl;
 /* eslint-enable no-unused-vars */
 
+// Updates the system's time in UTC
 function getTime() {
     const d = new Date();
     const utcString = d.toUTCString();

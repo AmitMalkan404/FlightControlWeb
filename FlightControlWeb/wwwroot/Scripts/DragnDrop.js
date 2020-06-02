@@ -9,11 +9,12 @@ function preventDefaults(e) {
     dropArea.addEventListener(eventName, preventDefaults, false);
 });
 
-
+// Highlights the drop area
 function highlight() {
     dropArea.classList.add('highlight');
 }
 
+//// Stops highlighting the drop area
 function unhighlight() {
     dropArea.classList.remove('highlight');
 }
@@ -25,12 +26,13 @@ function unhighlight() {
 ['dragleave', 'drop'].forEach((eventName) => {
     dropArea.addEventListener(eventName, unhighlight, false);
 });
+
 /* eslint-disable no-undef */
 /* eslint-disable no-prototype-builtins */
+// Uploads file to server.
 function uploadFile(file) {
     //const url = 'https://localhost:5001/api/FlightPlan';
     const url = '/api/FlightPlan';
-
     try {
         (async () => {
             const rawResponse = await fetch(url, {
@@ -40,7 +42,9 @@ function uploadFile(file) {
             if (rawResponse.ok) {
                 console.log('no errors');
                 return;
-            } else {
+            }
+            // Handle errors returned from server.
+            else {
                 const jsonContent = await rawResponse.json();
                 for (const err in jsonContent.errors) {
                     if (jsonContent.errors.hasOwnProperty(err)) {
@@ -53,22 +57,6 @@ function uploadFile(file) {
     } catch (err) {
         console.log('error: ' + err.message);
     }
-
-    //fetch(url,
-    //    {
-    //        method: 'POST',
-    //        body: file
-    //    })
-    //    .then((response) => response.json())
-    //    .then((data) => {
-    //        for (const err in data.errors) {
-    //            if (data.errors.hasOwnProperty(err)) {
-    //                // console.log(data.errors[err].toString());
-    //                PostErrorNotification(data.errors[err].toString());
-    //            }
-    //        }
-    //    })
-    //    .catch((err) => {console.log(err);});
 }
 /* eslint-enable no-prototype-builtins */
 /* eslint-enable no-undef */

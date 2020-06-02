@@ -1,4 +1,6 @@
-﻿class Flight {
+﻿// Define Flight class
+/* eslint-disable no-unused-vars */
+class Flight {
     constructor(id, lat, lon, company, passengers) {
         this.id = id;
         this.latitude = lat;
@@ -19,3 +21,4 @@
         return this.planeMarker;
     }
 }
+/* eslint-enable no-unused-vars */
