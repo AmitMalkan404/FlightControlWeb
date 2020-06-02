@@ -274,4 +274,4 @@ function getFlights() {
 }
 /* eslint-enable no-undef */
 
-setInterval(getFlights, 600);
+setInterval(getFlights, 1000);
