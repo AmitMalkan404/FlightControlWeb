@@ -29,7 +29,9 @@ namespace FlightControlWeb.Controllers
         public async Task<ActionResult<IEnumerable<Flight>>> GetAllFlight(string relative_to)
         {
             string request = Request.QueryString.Value;
+            // Check if we have 'sync_all' which means we will have to get flights from our servers list.
             bool isExternal = request.Contains("sync_all");
+            // Create the date format.
             DateTime myTime = DateTime.Parse(relative_to);
             myTime = TimeZoneInfo.ConvertTimeToUtc(myTime);
             // Get all non extrernal flights.
@@ -42,6 +44,7 @@ namespace FlightControlWeb.Controllers
             {
                 List<Segment> segmentList = flightPlan.SegmentsList;
                 string flightId = flightPlan.FlightId;
+                // Get the current location of the flight.
                 Segment resultSegment = GetMyLocation(flightPlan.InitialLocation.Longitude, flightPlan.InitialLocation.Longitude, flightPlan.InitialLocation.DateTime, 
                     flightPlan.FlightId, myTime, segmentList);
                 // The result can be null which means the flight isnt relevant any more.
@@ -49,12 +52,14 @@ namespace FlightControlWeb.Controllers
                 {
                     continue;
                 }
+                // Create the flight from the flightplan details.
                 Flight myflight = CreateFlight(flightPlan.CompanyName, flightPlan.FlightId, flightPlan.Passengers, flightPlan.IsExternal, resultSegment, myTime);
                 resultAllFlights.Add(myflight);
             }
             // This is all the external flights.
             if (isExternal)
             {
+                // Get all the flights from the servers lists,
                 List<Flight> getAllExternalFlight = await GetExternalFlights(allServers, relative_to);
                 resultAllFlights.AddRange(getAllExternalFlight);
             }
@@ -64,6 +69,7 @@ namespace FlightControlWeb.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<FlightPlan>> DeleteFlightPlan(string id)
         {
+            // Find the flight using the id from the DB.
             var flightPlan = await _context.FlightItems.Where(x => x.FlightId == id).FirstAsync();
             if (flightPlan == null)
             {
@@ -97,9 +103,9 @@ namespace FlightControlWeb.Controllers
             return myFlight;
         }
 
-        // Get all flights from external servers.
         public async Task<List<Flight>> GetExternalFlights(List<Server> allServers, string dateTime)
         {
+            // For each server from our list, get its flights.
             List<Flight> allExternalFlights = new List<Flight>();
             for (int i = 0; i < allServers.Count; i++)
             {
@@ -119,6 +125,7 @@ namespace FlightControlWeb.Controllers
             try
             {
                 List<Flight> allExternalFlights = new List<Flight>();
+                // Create the url usning the servers name to send the GET request,
                 string url = "";
                 url += myServer.ServerURL;
                 url += "/api/Flights?relative_to=";
@@ -127,9 +134,12 @@ namespace FlightControlWeb.Controllers
                 HttpClient client = new HttpClient();
                 var response = await client.GetStringAsync(url);
                 string stringJsonFlight = response.ToString();
+                //HttpResponseMessage response = await client.GetAsync(url);
+                //string stringJsonFlight = await response.Content.ReadAsStringAsync();
                 List<Flight> flightPlanList = JsonConvert.DeserializeObject<List<Flight>>(stringJsonFlight);
                 foreach(Flight flight in flightPlanList)
                 {
+                    // Make sure those flights will marked as external flights.
                     flight.IsExternal = true;
                 }
                 return flightPlanList;
@@ -149,6 +159,7 @@ namespace FlightControlWeb.Controllers
             double thisFlightLatitude = latitude;
             double thisFlightLongitude = latitude;
             DateTime thisFlightTime = initialDateTime;
+            // Calculate the time that passed sice the beginning of the flight.
             TimeSpan secondsPassedSpanTillNow = relativeTo - thisFlightTime;
             double secondsPassedTillNow = secondsPassedSpanTillNow.TotalSeconds;
             // compare relative time and start time.
@@ -169,6 +180,7 @@ namespace FlightControlWeb.Controllers
             };
             foreach (var segment in segmentList)
             {
+                // Check which segment the flight in.
                 if ((secondsPassedTillNow - segment.TimespanSeconds) < 0)
                 {
                     currSegment = segment;
@@ -181,6 +193,7 @@ namespace FlightControlWeb.Controllers
             }
             if (isFuture)
             {
+                // Check if we checked all the segments, and the flight is a future flight.
                 return null;
             }
             double proportionalTime = secondsPassedTillNow / currSegment.TimespanSeconds;
@@ -189,6 +202,7 @@ namespace FlightControlWeb.Controllers
         }
         Segment FindMyLocationMath(Segment prevSegment, Segment currSegment,double proportionalTime)
         {
+            // Simple math to calculte the new flight location using the time that passed the the distance.
             double distLatitude = currSegment.Latitude -prevSegment.Latitude;
             double distLongitude = currSegment.Longitude - prevSegment.Longitude;
             double latitudeResult = prevSegment.Latitude + (proportionalTime * distLatitude);
@@ -202,6 +216,7 @@ namespace FlightControlWeb.Controllers
         }
         public async void AddAllExternalFlightToDb(List<Flight> allExternalFlight, string severUrl)
         {
+            // Adding all the flights we got from a specific server and save it in the flight id to server Db.
             if(allExternalFlight == null)
             {
                 return;

@@ -20,12 +20,12 @@ namespace FlightControlWeb.Models
 		public int Passengers { get; set; }
 		[JsonProperty("company_name")]
 		
-		[Required]
+		[Required(ErrorMessage = "Flight plan has to have a company_name")]
 		public string CompanyName { get; set; }
 		[JsonProperty("initial_location")]
 		public InitialLocation InitialLocation{ get; set; }
 		[JsonProperty("segments")]
-		[Required]
+		[Required(ErrorMessage = "A flight has to have a have route")]
 		public List<Segment> SegmentsList{ get; set; }
 
 		[JsonProperty("is_external")]
