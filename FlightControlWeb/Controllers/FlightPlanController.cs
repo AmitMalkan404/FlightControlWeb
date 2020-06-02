@@ -75,9 +75,12 @@ namespace FlightControlWeb.Controllers
             int flightIdlen = flightId.Length;
             for (int i= flightIdlen+1; i<10;i++)
             {
+                if (flightId.Length >= 9)
+                {
+                    break;
+                }
                 flightId += _flightsNumber;
                 _flightsNumber++;
-                i++;
             }
             return flightId;
         }
