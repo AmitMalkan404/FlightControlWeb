@@ -37,20 +37,13 @@ body {
     height: 300px;
 }
 
-.my-row {
-    /* border: 1px solid black; */
-}
-
-.my-col {
-    /* border: 1px solid black; */
-}
 /* map style */
 #mapid {
     height: 470px;
     width: 100%;
 }
+
 /* scrollbar */
-/* width */
 ::-webkit-scrollbar {
     width: 10px;
 }
@@ -71,6 +64,7 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+
 /* drag&drop */
 #drop-area {
     border: 2.5px dashed gray;
@@ -79,7 +73,6 @@ body {
     min-height: 287px;
     font-family: sans-serif;
     margin: 5px auto;
-    /* padding: 20px; */
 }
 
 #drop-area.highlight {
@@ -93,19 +86,6 @@ p {
 .my-form {
     margin-bottom: 10px;
 }
-
-/*.button {
-    display: inline-block;
-    padding: 10px;
-    background: #ccc;
-    cursor: pointer;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-
-.button:hover {
-    background: #ddd;
-}*/
 
 #fileElem {
     display: none;
